@@ -24,4 +24,8 @@ class DatabaseNotification extends BaseDatabaseNotification
         $builder->where('created_at', '<', $date);
     }
 
+    public function scopeGroupByNotifiable(Builder $builder): void
+    {
+        $builder->groupBy('notifiable_type', 'notifiable_id');
+    }
 }
