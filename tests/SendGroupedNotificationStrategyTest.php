@@ -21,7 +21,8 @@ class SendGroupedNotificationStrategyTest extends TestCase
         // assert
         Bus::assertDispatched(SendThrottledNotificationGroup::class, 1);
         Bus::assertDispatched(SendThrottledNotificationGroup::class, function ($notification) use ($expected) {
-            return $notification->databaseNotification()->is($expected);
+            $this->assertSame($expected, $notification->databaseNotification());
+            return true;
         });
     }
 }

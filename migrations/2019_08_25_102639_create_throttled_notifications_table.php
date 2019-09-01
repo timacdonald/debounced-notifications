@@ -9,8 +9,10 @@ class CreateThrottledNotificationsTable extends Migration
     {
         Schema::create('throttled_notifications', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('payload');
+            $table->longText('payload');
             $table->dateTime('sent_at')->nullable();
+            $table->dateTime('delayed_until')->nullable();
+            $table->string('reserved_key')->nullable();
             $table->uuid('notification_id');
             $table->timestamps();
 

@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notifiable as NotifiableTrait;
 use Illuminate\Notifications\Notification;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use TiMacDonald\ThrottledNotifications\ServiceProvider;
@@ -32,16 +32,9 @@ class TestCase extends BaseTestCase
     }
 }
 
-class TestThrottledNotification extends Notification implements ShouldThrottle
+class DummyThrottledNotification extends Notification implements ShouldThrottle
 {
     use Throttleable;
-
-    public $constructorArgs;
-
-    public function __construct()
-    {
-        $this->constructorArgs = func_get_args();
-    }
 
     public function throttledVia($notifiable): array
     {
@@ -49,13 +42,9 @@ class TestThrottledNotification extends Notification implements ShouldThrottle
     }
 }
 
-class TestNotifiable extends Model
+class Notifiable extends Model
 {
-    use Notifiable;
+    use NotifiableTrait;
 
     protected $guarded = [];
-
-    protected $attributes = [
-        'id' => 4321,
-    ];
 }

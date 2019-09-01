@@ -14,19 +14,43 @@ class ThrottledNotification extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @var array
+     */
+    protected $casts = [
+        'delayed_until' => 'datetime',
+    ];
+
     public function databaseNotification(): BelongsTo
     {
         return $this->belongsTo(DatabaseNotification::class, 'notification_id');
     }
 
-    public function setPayloadAttribute(ShouldThrottle $notification): void
+    protected function setPayloadAttribute(ShouldThrottle $notification): void
     {
         $this->attributes['payload'] = serialize($notification);
     }
 
-    public function getPayloadAttribute(string $value): ShouldThrottle
+    protected function getPayloadAttribute(string $value): ShouldThrottle
     {
         return unserialize($value);
+    }
+
+    public function isSent(): bool
+    {
+        return $this->sent_at !== null;
+    }
+
+    public function scopeReserve(Builder $builder, string $key): bool
+    {
+        return $builder->update([
+            'reservation_key' => $key,
+        ]);
+    }
+
+    public function scopeWhereReservationKey(Builder $builder, string $key): void
+    {
+        $builder->where('reservation_key', '=', $key);
     }
 
     public function scopeWhereUnsent(Builder $builder): void
@@ -34,13 +58,18 @@ class ThrottledNotification extends Model
         $builder->whereNull('sent_at');
     }
 
-    public function scopeWhereCreatedBefore(Builder $builder, Carbon $date)
+    public function scopeWhereNotDelayed(Builder $builder): void
     {
-        $builder->where('created_at', '<', $date);
+        $builder->whereNull('delayed_until');
     }
 
-    public function isSent(): bool
+    public function scopeWhereDelayed(Builder $builder): void
     {
-        return $this->sent_at !== null;
+        $builder->whereNotNull('delayed_until');
+    }
+
+    public function scopeWhereCreatedBefore(Builder $builder, Carbon $date): void
+    {
+        $builder->where('created_at', '<', $date);
     }
 }
