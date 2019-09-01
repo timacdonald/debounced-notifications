@@ -44,13 +44,18 @@ class ThrottledNotification extends Model
     public function scopeReserve(Builder $builder, string $key): bool
     {
         return $builder->update([
-            'reservation_key' => $key,
+            'reserved_key' => $key,
         ]);
     }
 
     public function scopeWhereReservationKey(Builder $builder, string $key): void
     {
-        $builder->where('reservation_key', '=', $key);
+        $builder->where('reserved_key', '=', $key);
+    }
+
+    public function scopeWhereNotReserved(Builder $builder): void
+    {
+        $builder->whereNull('reserved_key');
     }
 
     public function scopeWhereUnsent(Builder $builder): void

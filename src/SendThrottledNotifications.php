@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class SendThrottledNotifications implements ShouldQueue
 {
@@ -22,32 +23,71 @@ class SendThrottledNotifications implements ShouldQueue
 
     public function handle(Dispatcher $bus): void
     {
-        $this->query()->each(function (DatabaseNotification $databaseNotification) {
-            dd(func_get_args());
+        $this->notifiables()->each(function (stdClass $notifiable) use ($bus) {
+            $bus->dispatch(new SendThrottledNotificationsToNotifiable($this->hydrate($notifiable)));
         });
     }
 
-    private function query()
+    private function notifiables(): Builder
     {
         return $this->databaseNotifications()
-            ->leftJoinSub($this->throttledNotifications(), 'throttled_notifications', function (JoinClause $join) {
-                $join->on('notifications.id', '=', 'throttled_notifications.notification_id');
-            })
-            ->groupBy(['notifiable_type', 'notifiable_id']);
+            ->joinSub(...$this->join())
+            ->groupBy([
+                'notifiable_id',
+                'notifiable_type',
+            ])
+            ->select([
+                'notifications.notifiable_id as id',
+                'notifications.notifiable_type as type',
+            ])
+            ->oldest('notifications.created_at');
     }
 
-    private function throttledNotifications()
+    private function throttledNotifications(): Builder
     {
         return ThrottledNotification::query()
             ->whereUnsent()
             ->whereNotDelayed()
-            ->whereCreatedBefore(now()->subSeconds(config('throttled-notifications.wait')));
+            ->whereNotReserved()
+            ->whereCreatedBefore($this->before())
+            ->getQuery();
     }
 
-    private function databaseNotifications()
+    private function databaseNotifications(): Builder
     {
         return DatabaseNotification::query()
             ->whereUnread()
-            ->oldest();
+            ->getQuery();
+    }
+
+    private function before(): Carbon
+    {
+        return Carbon::now()->subSeconds($this->wait());
+    }
+
+    private function wait(): int
+    {
+        return config('throttled-notifications.wait');
+    }
+
+    private function join(): array
+    {
+        return [
+            $this->throttledNotifications(),
+            'throttled_notifications',
+            function (JoinClause $join) {
+                $join->on('notifications.id', '=', 'throttled_notifications.notification_id');
+            },
+        ];
+    }
+
+    /**
+     * @return mixed
+     */
+    private function hydrate(stdClass $notifiable)
+    {
+        return tap($notifiable->type::newModelInstance(), function ($instance) use ($notifiable) {
+            $instance->forceFill([$instance->getKeyName() => $notifiable->id]);
+        });
     }
 }

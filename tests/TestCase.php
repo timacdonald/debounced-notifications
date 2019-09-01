@@ -45,6 +45,4 @@ class DummyThrottledNotification extends Notification implements ShouldThrottle
 class Notifiable extends Model
 {
     use NotifiableTrait;
-
-    protected $guarded = [];
 }

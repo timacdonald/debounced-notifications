@@ -26,7 +26,7 @@ class ThrottleChannelTest extends TestCase
     public function test_throttled_notification_is_created()
     {
         // arrange
-        $notifiable = new DummyNotifiable(['id' => 1]);
+        $notifiable = factory(Notifiable::class)->create();
         $notification = new DummyThrottledNotification;
 
         // act
@@ -39,7 +39,7 @@ class ThrottleChannelTest extends TestCase
     public function test_not_delayed_if_notifiable_doesnt_implement_delay_until_method()
     {
         // arrange
-        $notifiable = new DummyNotifiable(['id' => 1]);
+        $notifiable = factory(Notifiable::class)->create();
         $notification = new DummyThrottledNotification;
 
         // act
@@ -53,7 +53,9 @@ class ThrottleChannelTest extends TestCase
     {
         // arrange
         Carbon::setTestNow(Carbon::parse('2019-09-10 12:51:00'));
-        $notifiable = new class(['id' => 1]) extends DummyNotifiable {
+        $notifiable = new class() extends Notifiable {
+            protected $attributes = ['id' => 54321];
+
             public function delayNotificationsUntil() {
                 return now()->addDay();
             }
@@ -72,7 +74,9 @@ class ThrottleChannelTest extends TestCase
     {
         // arrange
         Carbon::setTestNow(Carbon::parse('2019-09-10 12:51:00'));
-        $notifiable = new class(['id' => 1]) extends DummyNotifiable {
+        $notifiable = new class() extends Notifiable {
+            protected $attributes = ['id' => 54321];
+
             public function delayNotificationsUntil() {
                 return now();
             }
@@ -90,8 +94,10 @@ class ThrottleChannelTest extends TestCase
     {
         // arrange
         Carbon::setTestNow(Carbon::parse('2019-09-10 12:51:00'));
-        $notifiable = new class(['id' => 1]) extends DummyNotifiable {
+        $notifiable = new class() extends Notifiable {
+            protected $attributes = ['id' => 54321];
             public function delayNotificationsUntil() {
+
                 return now()->subMinute();
             }
         };

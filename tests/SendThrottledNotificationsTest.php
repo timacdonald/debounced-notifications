@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Bus;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\SendThrottledNotifications;
 use TiMacDonald\ThrottledNotifications\SendThrottledNotificationGroup;
+use TiMacDonald\ThrottledNotifications\SendThrottledNotificationsToNotifiable;
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 
 class SendThrottledNotificationsTest extends TestCase
@@ -20,71 +21,10 @@ class SendThrottledNotificationsTest extends TestCase
         $read = factory(DatabaseNotification::class)->states(['read'])->create();
         factory(ThrottledNotification::class)->create([
             'notification_id' => $read->id,
+            'created_at' => now()->subMinutes(11),
         ]);
         factory(ThrottledNotification::class)->create([
             'notification_id' => $unread->id,
-        ]);
-
-        // act
-        $this->app->call([new SendThrottledNotifications, 'handle']);
-
-        // assert
-        //$this->assertCount(1, $result);
-        //$this->assertTrue($result[0]->is($unread));
-    }
-
-    public function testSentNotificationsAreIgnored()
-    {
-        // arrange
-        $result = collect();
-        $unsent = factory(ThrottledNotification::class)->create();
-        factory(ThrottledNotification::class)->states(['sent'])->create();
-
-        // act
-        $this->app->make(SendThrottledNotifications::class, ['date' => now()->addSecond()])
-            ->handle(function ($notification) use ($result) {
-                $result[] = $notification;
-            });
-
-        // assert
-        $this->assertCount(1, $result);
-        $this->assertTrue($result[0]->throttledNotification->is($unsent));
-    }
-
-    public function testOnlyThrottledNotificationsOlderThanSpecifiedMinutesAreQueued()
-    {
-        // arrange
-        Carbon::setTestNow(now());
-        $result = collect();
-        $old = factory(ThrottledNotification::class)->create([
-            'created_at' => now()->subMinutes(22)->subSeconds(1),
-        ]);
-        factory(ThrottledNotification::class)->create([
-            'created_at' => now()->subMinutes(22),
-        ]);
-
-        // act
-        $this->app->make(SendThrottledNotifications::class, ['date' => now()->subMinutes(22)])
-            ->handle(function ($notification) use ($result) {
-                $result[] = $notification;
-            });
-
-        // assert
-        $this->assertCount(1, $result);
-        $this->assertTrue($result[0]->throttledNotification->is($old));
-    }
-
-    public function testOnlyDispatchesOneJobPerNotifiableThatIsTheOldest()
-    {
-        // arrange
-        $result = collect();
-        $databaseNotification = factory(DatabaseNotification::class)->create();
-        $oldest = factory(ThrottledNotification::class)->create([
-            'notification_id' => $databaseNotification->id,
-            'created_at' => now()->subMinutes(12),
-        ]);
-        factory(ThrottledNotification::class)->create([
-            'notification_id' => $databaseNotification->id,
             'created_at' => now()->subMinutes(11),
         ]);
 
@@ -92,7 +32,80 @@ class SendThrottledNotificationsTest extends TestCase
         $this->app->call([new SendThrottledNotifications, 'handle']);
 
         // assert
-        $this->assertCount(1, $result);
-        $this->assertTrue($result[0]->throttledNotification->is($oldest));
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($unread) {
+            $this->assertTrue($job->notifiable()->is($unread->notifiable));
+            return true;
+        });
+    }
+
+    public function testSentNotificationsAreIgnored()
+    {
+        // arrange
+        Bus::fake();
+        $unsent = factory(ThrottledNotification::class)->create([
+            'created_at' => now()->subMinutes(11),
+        ]);
+        factory(ThrottledNotification::class)->states(['sent'])->create([
+            'created_at' => now()->subMinutes(11),
+        ]);
+
+        // act
+        $this->app->call([new SendThrottledNotifications, 'handle']);
+
+        // assert
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($unsent) {
+            $this->assertTrue($job->notifiable()->is($unsent->databaseNotification->notifiable));
+            return true;
+        });
+    }
+
+    public function testOnlyThrottledNotificationsOlderThanSpecifiedMinutesAreQueued()
+    {
+        // arrange
+        Carbon::setTestNow(now());
+        Bus::fake();
+        $oldest = factory(ThrottledNotification::class)->create([
+            'created_at' => now()->subMinutes(10)->subSeconds(1),
+        ]);
+        factory(ThrottledNotification::class)->create([
+            'created_at' => now()->subMinutes(10),
+        ]);
+
+        // act
+        $this->app->call([new SendThrottledNotifications, 'handle']);
+
+        // assert
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($oldest) {
+            $this->assertTrue($job->notifiable()->is($oldest->databaseNotification->notifiable));
+            return true;
+        });
+    }
+
+    public function testOnlyDispatchesOneJobPerNotifiableThatIsTheOldest()
+    {
+        // arrange
+        Bus::fake();
+        $databaseNotification = factory(DatabaseNotification::class)->create();
+        factory(ThrottledNotification::class)->create([
+            'notification_id' => $databaseNotification->id,
+            'created_at' => now()->subMinutes(11),
+        ]);
+        $oldest = factory(ThrottledNotification::class)->create([
+            'notification_id' => $databaseNotification->id,
+            'created_at' => now()->subMinutes(12),
+        ]);
+
+        // act
+        $this->app->call([new SendThrottledNotifications, 'handle']);
+
+        // assert
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
+        Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($oldest) {
+            $this->assertTrue($job->notifiable()->is($oldest->databaseNotification->notifiable));
+            return true;
+        });
     }
 }
