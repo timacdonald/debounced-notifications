@@ -8,7 +8,6 @@ use Illuminate\Notifications\Notifiable as NotifiableTrait;
 use Illuminate\Notifications\Notification;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use TiMacDonald\ThrottledNotifications\ServiceProvider;
-use TiMacDonald\ThrottledNotifications\ShouldThrottle;
 use TiMacDonald\ThrottledNotifications\Throttleable;
 
 class TestCase extends BaseTestCase
@@ -32,7 +31,7 @@ class TestCase extends BaseTestCase
     }
 }
 
-class DummyThrottledNotification extends Notification implements ShouldThrottle
+class DummyThrottledNotification extends Notification
 {
     use Throttleable;
 
@@ -46,3 +45,4 @@ class Notifiable extends Model
 {
     use NotifiableTrait;
 }
+

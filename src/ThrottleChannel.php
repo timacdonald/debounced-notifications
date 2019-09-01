@@ -3,8 +3,10 @@
 namespace TiMacDonald\ThrottledNotifications;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Notification;
 
 class ThrottleChannel
 {
@@ -18,10 +20,7 @@ class ThrottleChannel
         $this->databaseChannel = $databaseChannel;
     }
 
-    /**
-     * @param mixed $notifiable
-     */
-    public function send($notifiable, ShouldThrottle $notification): ThrottledNotification
+    public function send(Model $notifiable, Notification $notification): ThrottledNotification
     {
         $delayUntil = $this->delayNotificationsUntil($notifiable);
 
@@ -32,18 +31,12 @@ class ThrottleChannel
         ]);
     }
 
-    /**
-     * @param mixed $notifiable
-     */
-    private function databaseNotification($notifiable, ShouldThrottle $notification): DatabaseNotification
+    private function databaseNotification(Model $notifiable, Notification $notification): Model
     {
         return $this->databaseChannel->send($notifiable, $notification);
     }
 
-    /**
-     * @param mixed $notifiable
-     */
-    private function delayNotificationsUntil($notifiable): Carbon
+    private function delayNotificationsUntil(Model $notifiable): Carbon
     {
         if (method_exists($notifiable, 'delayNotificationsUntil')) {
             return $notifiable->delayNotificationsUntil();

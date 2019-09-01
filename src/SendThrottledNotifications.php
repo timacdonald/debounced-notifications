@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -81,12 +82,9 @@ class SendThrottledNotifications implements ShouldQueue
         ];
     }
 
-    /**
-     * @return mixed
-     */
-    private function hydrate(stdClass $notifiable)
+    private function hydrate(stdClass $notifiable): Model
     {
-        return tap($notifiable->type::newModelInstance(), function ($instance) use ($notifiable) {
+        return tap($notifiable->type::newModelInstance(), function (Model $instance) use ($notifiable) {
             $instance->forceFill([$instance->getKeyName() => $notifiable->id]);
         });
     }

@@ -2,20 +2,16 @@
 
 namespace TiMacDonald\ThrottledNotifications;
 
+use Illuminate\Database\Eloquent\Model;
+
 trait Throttleable
 {
-    /**
-     * @param mixed $notifiable
-     */
-    public function via($notifiable): array
+    public function via(Model $notifiable): array
     {
         return [ThrottleChannel::class];
     }
 
-    /**
-     * @param mixed $notifiable
-     */
-    public function toArray($notifiable): array
+    public function toArray(Model $notifiable): array
     {
         return [];
     }

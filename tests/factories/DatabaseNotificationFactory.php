@@ -1,8 +1,9 @@
 <?php
 
-use Faker\Generator as Faker;
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use Tests\Notifiable;
+use Faker\Generator as Faker;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 
 $factory->define(DatabaseNotification::class, function (Faker $faker) {

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Notifications\Notification;
 
 class ThrottledNotification extends Model
 {
@@ -26,12 +27,12 @@ class ThrottledNotification extends Model
         return $this->belongsTo(DatabaseNotification::class, 'notification_id');
     }
 
-    protected function setPayloadAttribute(ShouldThrottle $notification): void
+    protected function setPayloadAttribute(Notification $notification): void
     {
         $this->attributes['payload'] = serialize($notification);
     }
 
-    protected function getPayloadAttribute(string $value): ShouldThrottle
+    protected function getPayloadAttribute(string $value): Notification
     {
         return unserialize($value);
     }
@@ -41,11 +42,9 @@ class ThrottledNotification extends Model
         return $this->sent_at !== null;
     }
 
-    public function scopeReserve(Builder $builder, string $key): bool
+    public function scopeReserve(Builder $builder, string $key): int
     {
-        return $builder->update([
-            'reserved_key' => $key,
-        ]);
+        return $builder->update(['reserved_key' => $key]);
     }
 
     public function scopeWhereReservationKey(Builder $builder, string $key): void

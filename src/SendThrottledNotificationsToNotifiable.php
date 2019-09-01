@@ -2,25 +2,21 @@
 
 namespace TiMacDonald\ThrottledNotifications;
 
+use Illuminate\Database\Eloquent\Model;
+
 class SendThrottledNotificationsToNotifiable
 {
     /**
-     * @var mixed
+     * @var \Illuminate\Database\Eloquent\Model
      */
     private $notifiable;
 
-    /**
-     * @param mixed $notifiable
-     */
-    public function __construct($notifiable)
+    public function __construct(Model $notifiable)
     {
         $this->notifiable = $notifiable;
     }
 
-    /**
-     * @return mixed
-     */
-    public function notifiable()
+    public function notifiable(): Model
     {
         return $this->notifiable;
     }
