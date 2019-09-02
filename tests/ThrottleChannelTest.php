@@ -14,7 +14,7 @@ class ThrottleChannelTest extends TestCase
     public function testDatabaseNotificationIsCreated(): void
     {
         // arrange
-        $notifiable = factory(Notifiable::class)->create();
+        $notifiable = \factory(Notifiable::class)->create();
         $notification = new DummyThrottledNotification();
 
         // act
@@ -27,7 +27,7 @@ class ThrottleChannelTest extends TestCase
     public function testThrottledNotificationIsCreated(): void
     {
         // arrange
-        $notifiable = factory(Notifiable::class)->create();
+        $notifiable = \factory(Notifiable::class)->create();
         $notification = new DummyThrottledNotification();
 
         // act
@@ -40,7 +40,7 @@ class ThrottleChannelTest extends TestCase
     public function testNotDelayedIfNotifiableDoesntImplementDelayUntilMethod(): void
     {
         // arrange
-        $notifiable = factory(Notifiable::class)->create();
+        $notifiable = \factory(Notifiable::class)->create();
         $notification = new DummyThrottledNotification();
 
         // act
@@ -59,7 +59,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return now()->addDay();
+                return \now()->addDay();
             }
         };
         $notification = new DummyThrottledNotification();
@@ -81,7 +81,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return now();
+                return \now();
             }
         };
         $notification = new DummyThrottledNotification();
@@ -102,7 +102,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return now()->subMinute();
+                return \now()->subMinute();
             }
         };
         $notification = new DummyThrottledNotification();

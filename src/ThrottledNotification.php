@@ -31,12 +31,12 @@ class ThrottledNotification extends Model
 
     protected function setPayloadAttribute(Notification $notification): void
     {
-        $this->attributes['payload'] = serialize($notification);
+        $this->attributes['payload'] = \serialize($notification);
     }
 
     protected function getPayloadAttribute(string $value): Notification
     {
-        return unserialize($value);
+        return \unserialize($value);
     }
 
     public function isSent(): bool

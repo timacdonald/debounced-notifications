@@ -17,15 +17,15 @@ class SendThrottledNotificationsTest extends TestCase
     {
         // arrange
         Bus::fake();
-        $unread = factory(DatabaseNotification::class)->create();
-        $read = factory(DatabaseNotification::class)->states(['read'])->create();
-        factory(ThrottledNotification::class)->create([
+        $unread = \factory(DatabaseNotification::class)->create();
+        $read = \factory(DatabaseNotification::class)->states(['read'])->create();
+        \factory(ThrottledNotification::class)->create([
             'notification_id' => $read->id,
-            'created_at' => now()->subMinutes(11),
+            'created_at' => \now()->subMinutes(11),
         ]);
-        factory(ThrottledNotification::class)->create([
+        \factory(ThrottledNotification::class)->create([
             'notification_id' => $unread->id,
-            'created_at' => now()->subMinutes(11),
+            'created_at' => \now()->subMinutes(11),
         ]);
 
         // act
@@ -44,11 +44,11 @@ class SendThrottledNotificationsTest extends TestCase
     {
         // arrange
         Bus::fake();
-        $unsent = factory(ThrottledNotification::class)->create([
-            'created_at' => now()->subMinutes(11),
+        $unsent = \factory(ThrottledNotification::class)->create([
+            'created_at' => \now()->subMinutes(11),
         ]);
-        factory(ThrottledNotification::class)->states(['sent'])->create([
-            'created_at' => now()->subMinutes(11),
+        \factory(ThrottledNotification::class)->states(['sent'])->create([
+            'created_at' => \now()->subMinutes(11),
         ]);
 
         // act
@@ -66,13 +66,13 @@ class SendThrottledNotificationsTest extends TestCase
     public function testOnlyThrottledNotificationsOlderThanSpecifiedMinutesAreQueued(): void
     {
         // arrange
-        Carbon::setTestNow(now());
+        Carbon::setTestNow(\now());
         Bus::fake();
-        $oldest = factory(ThrottledNotification::class)->create([
-            'created_at' => now()->subMinutes(10)->subSeconds(1),
+        $oldest = \factory(ThrottledNotification::class)->create([
+            'created_at' => \now()->subMinutes(10)->subSeconds(1),
         ]);
-        factory(ThrottledNotification::class)->create([
-            'created_at' => now()->subMinutes(10),
+        \factory(ThrottledNotification::class)->create([
+            'created_at' => \now()->subMinutes(10),
         ]);
 
         // act
@@ -91,14 +91,14 @@ class SendThrottledNotificationsTest extends TestCase
     {
         // arrange
         Bus::fake();
-        $databaseNotification = factory(DatabaseNotification::class)->create();
-        factory(ThrottledNotification::class)->create([
+        $databaseNotification = \factory(DatabaseNotification::class)->create();
+        \factory(ThrottledNotification::class)->create([
             'notification_id' => $databaseNotification->id,
-            'created_at' => now()->subMinutes(11),
+            'created_at' => \now()->subMinutes(11),
         ]);
-        $oldest = factory(ThrottledNotification::class)->create([
+        $oldest = \factory(ThrottledNotification::class)->create([
             'notification_id' => $databaseNotification->id,
-            'created_at' => now()->subMinutes(12),
+            'created_at' => \now()->subMinutes(12),
         ]);
 
         // act

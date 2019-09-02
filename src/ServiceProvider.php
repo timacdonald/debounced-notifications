@@ -21,7 +21,7 @@ class ServiceProvider extends BaseServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../migrations');
 
         $this->publishes([
-            $this->configPath => config_path('throttled-notifications.php'),
+            $this->configPath => \config_path('throttled-notifications.php'),
         ]);
     }
 

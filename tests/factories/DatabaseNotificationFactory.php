@@ -12,7 +12,7 @@ $factory->define(DatabaseNotification::class, static function (Faker $faker) {
         'id' => $faker->unique()->uuid,
         'type' => '',
         'notifiable_type' => Notifiable::class,
-        'notifiable_id' => factory(Notifiable::class)->create()->id,
+        'notifiable_id' => \factory(Notifiable::class)->create()->id,
         'data' => '{}',
     ];
 });

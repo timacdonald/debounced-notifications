@@ -29,7 +29,7 @@ class ThrottleChannel
         return ThrottledNotification::create([
             'payload' => $notification,
             'delayed_until' => ! $delayUntil->isFuture() ? null : $delayUntil,
-            'notification_id' => $this->databaseNotification(...func_get_args())->id,
+            'notification_id' => $this->databaseNotification($notifiable, $notification)->id,
         ]);
     }
 
@@ -40,7 +40,7 @@ class ThrottleChannel
 
     private function delayNotificationsUntil(Model $notifiable): Carbon
     {
-        if (method_exists($notifiable, 'delayNotificationsUntil')) {
+        if (\method_exists($notifiable, 'delayNotificationsUntil')) {
             return $notifiable->delayNotificationsUntil();
         }
 

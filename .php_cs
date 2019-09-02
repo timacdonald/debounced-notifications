@@ -78,7 +78,10 @@ return PhpCsFixer\Config::create()
         'multiline_whitespace_before_semicolons' => true,
         'native_constant_invocation' => true,
         'native_function_casing' => true,
-        'native_function_invocation' => true,
+        'native_function_invocation' => [
+            'include' => ['@all'],
+            'strict' => true,
+        ],
         'native_function_type_declaration_casing' => true,
         'new_with_braces' => true,
         'no_alias_functions' => true,

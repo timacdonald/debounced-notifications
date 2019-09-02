@@ -66,7 +66,7 @@ class SendThrottledNotifications implements ShouldQueue
 
     private function wait(): int
     {
-        return config('throttled-notifications.wait');
+        return \config('throttled-notifications.wait');
     }
 
     private function join(): array
@@ -82,7 +82,7 @@ class SendThrottledNotifications implements ShouldQueue
 
     private function hydrate(stdClass $notifiable): Model
     {
-        return tap($notifiable->type::newModelInstance(), static function (Model $instance) use ($notifiable): void {
+        return \tap($notifiable->type::newModelInstance(), static function (Model $instance) use ($notifiable): void {
             $instance->forceFill([$instance->getKeyName() => $notifiable->id]);
         });
     }

@@ -11,7 +11,7 @@ use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 $factory->define(ThrottledNotification::class, static function (Faker $faker) {
     return [
         'payload' => new DummyThrottledNotification(),
-        'notification_id' => factory(DatabaseNotification::class),
+        'notification_id' => \factory(DatabaseNotification::class),
     ];
 });
 
