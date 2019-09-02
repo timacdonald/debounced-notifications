@@ -20,3 +20,9 @@ $factory->state(ThrottledNotification::class, 'sent', static function (Faker $fa
         'sent_at' => $faker->dateTime,
     ];
 });
+
+$factory->state(ThrottledNotification::class, 'delayed', static function (Faker $faker) {
+    return [
+        'delayed_until' => $faker->dateTime,
+    ];
+});

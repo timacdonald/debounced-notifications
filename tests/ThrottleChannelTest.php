@@ -59,7 +59,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return \now()->addDay();
+                return Carbon::now()->addDay();
             }
         };
         $notification = new DummyThrottledNotification();
@@ -81,7 +81,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return \now();
+                return Carbon::now();
             }
         };
         $notification = new DummyThrottledNotification();
@@ -102,7 +102,7 @@ class ThrottleChannelTest extends TestCase
 
             public function delayNotificationsUntil()
             {
-                return \now()->subMinute();
+                return Carbon::now()->subMinute();
             }
         };
         $notification = new DummyThrottledNotification();

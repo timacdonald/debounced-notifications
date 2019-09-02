@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\InteractsWithQueue;
@@ -36,8 +37,8 @@ class SendThrottledNotifications implements ShouldQueue
                 'notifiable_type',
             ])
             ->select([
-                'notifications.notifiable_id as id',
-                'notifications.notifiable_type as type',
+                'notifications.notifiable_id as key',
+                'notifications.notifiable_type as class',
             ])
             ->oldest('notifications.created_at');
     }
@@ -66,7 +67,7 @@ class SendThrottledNotifications implements ShouldQueue
 
     private function wait(): int
     {
-        return \config('throttled-notifications.wait');
+        return Config::get('throttled-notifications.wait');
     }
 
     private function join(): array
@@ -82,8 +83,8 @@ class SendThrottledNotifications implements ShouldQueue
 
     private function hydrate(stdClass $notifiable): Model
     {
-        return \tap($notifiable->type::newModelInstance(), static function (Model $instance) use ($notifiable): void {
-            $instance->forceFill([$instance->getKeyName() => $notifiable->id]);
+        return \tap($notifiable->class::newModelInstance(), static function (Model $instance) use ($notifiable): void {
+            $instance->forceFill([$instance->getKeyName() => $notifiable->key]);
         });
     }
 }
