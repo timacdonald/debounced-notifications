@@ -15,14 +15,13 @@ class ServiceProvider extends BaseServiceProvider
 
     public function boot(): void
     {
-        if (! $this->app->runningInConsole()) {
-            return;
-        }
-        $this->loadMigrationsFrom(__DIR__.'/../migrations');
+        if ($this->app->runningInConsole()) {
+            $this->loadMigrationsFrom(__DIR__.'/../migrations');
 
-        $this->publishes([
-            $this->configPath => \config_path('throttled-notifications.php'),
-        ]);
+            $this->publishes([
+                $this->configPath => \config_path('throttled-notifications.php'),
+            ]);
+        }
     }
 
     public function register(): void

@@ -39,21 +39,6 @@ class ThrottledNotification extends Model
         return \unserialize($value);
     }
 
-    public function isSent(): bool
-    {
-        return $this->sent_at !== null;
-    }
-
-    public function scopeReserve(Builder $builder, string $key): int
-    {
-        return $builder->update(['reserved_key' => $key]);
-    }
-
-    public function scopeWhereReservationKey(Builder $builder, string $key): void
-    {
-        $builder->where('reserved_key', '=', $key);
-    }
-
     public function scopeWhereNotReserved(Builder $builder): void
     {
         $builder->whereNull('reserved_key');
