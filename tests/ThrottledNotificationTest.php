@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 
 class ThrottledNotificationTest extends TestCase
 {
-    public function test_payload_is_serialized_and_deserialized()
+    public function testPayloadIsSerializedAndDeserialized(): void
     {
         // arrange
         $notification = new ThrottledNotificationTestDummyNotification('expected value');
-        $throttledNotification = new ThrottledNotification;
+        $throttledNotification = new ThrottledNotification();
 
         // act
         $throttledNotification->payload = $notification;

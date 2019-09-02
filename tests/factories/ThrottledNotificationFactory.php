@@ -1,22 +1,22 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+declare(strict_types=1);
 
 use Faker\Generator as Faker;
 use Tests\DummyThrottledNotification;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 
-$factory->define(ThrottledNotification::class, function (Faker $faker) {
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(ThrottledNotification::class, static function (Faker $faker) {
     return [
-        'payload' => new DummyThrottledNotification,
+        'payload' => new DummyThrottledNotification(),
         'notification_id' => factory(DatabaseNotification::class),
     ];
 });
 
-$factory->state(ThrottledNotification::class, 'sent', function (Faker $faker) {
+$factory->state(ThrottledNotification::class, 'sent', static function (Faker $faker) {
     return [
         'sent_at' => $faker->dateTime,
     ];
 });
-

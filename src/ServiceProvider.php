@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TiMacDonald\ThrottledNotifications;
 
-use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider

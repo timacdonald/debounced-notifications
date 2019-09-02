@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class CreateThrottledNotificationsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
-        Schema::create('throttled_notifications', function (Blueprint $table) {
+        Schema::create('throttled_notifications', static function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->longText('payload');
             $table->dateTime('sent_at')->nullable();
@@ -23,7 +25,7 @@ class CreateThrottledNotificationsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('throttled_notifications');
     }

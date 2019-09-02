@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Bus;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
-use TiMacDonald\ThrottledNotifications\SendThrottledNotifications;
-use TiMacDonald\ThrottledNotifications\SendThrottledNotificationGroup;
-use TiMacDonald\ThrottledNotifications\SendThrottledNotificationsToNotifiable;
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\SendThrottledNotifications;
+use TiMacDonald\ThrottledNotifications\SendThrottledNotificationsToNotifiable;
 
 class SendThrottledNotificationsTest extends TestCase
 {
-    public function testReadNotificationsAreIgnored()
+    public function testReadNotificationsAreIgnored(): void
     {
         // arrange
         Bus::fake();
@@ -29,17 +29,18 @@ class SendThrottledNotificationsTest extends TestCase
         ]);
 
         // act
-        $this->app->call([new SendThrottledNotifications, 'handle']);
+        $this->app->call([new SendThrottledNotifications(), 'handle']);
 
         // assert
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($unread) {
             $this->assertTrue($job->notifiable()->is($unread->notifiable));
+
             return true;
         });
     }
 
-    public function testSentNotificationsAreIgnored()
+    public function testSentNotificationsAreIgnored(): void
     {
         // arrange
         Bus::fake();
@@ -51,17 +52,18 @@ class SendThrottledNotificationsTest extends TestCase
         ]);
 
         // act
-        $this->app->call([new SendThrottledNotifications, 'handle']);
+        $this->app->call([new SendThrottledNotifications(), 'handle']);
 
         // assert
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($unsent) {
             $this->assertTrue($job->notifiable()->is($unsent->databaseNotification->notifiable));
+
             return true;
         });
     }
 
-    public function testOnlyThrottledNotificationsOlderThanSpecifiedMinutesAreQueued()
+    public function testOnlyThrottledNotificationsOlderThanSpecifiedMinutesAreQueued(): void
     {
         // arrange
         Carbon::setTestNow(now());
@@ -74,17 +76,18 @@ class SendThrottledNotificationsTest extends TestCase
         ]);
 
         // act
-        $this->app->call([new SendThrottledNotifications, 'handle']);
+        $this->app->call([new SendThrottledNotifications(), 'handle']);
 
         // assert
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($oldest) {
             $this->assertTrue($job->notifiable()->is($oldest->databaseNotification->notifiable));
+
             return true;
         });
     }
 
-    public function testOnlyDispatchesOneJobPerNotifiableThatIsTheOldest()
+    public function testOnlyDispatchesOneJobPerNotifiableThatIsTheOldest(): void
     {
         // arrange
         Bus::fake();
@@ -99,12 +102,13 @@ class SendThrottledNotificationsTest extends TestCase
         ]);
 
         // act
-        $this->app->call([new SendThrottledNotifications, 'handle']);
+        $this->app->call([new SendThrottledNotifications(), 'handle']);
 
         // assert
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, 1);
         Bus::assertDispatched(SendThrottledNotificationsToNotifiable::class, function ($job) use ($oldest) {
             $this->assertTrue($job->notifiable()->is($oldest->databaseNotification->notifiable));
+
             return true;
         });
     }

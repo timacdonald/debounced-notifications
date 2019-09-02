@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Notifications\Notifiable as NotifiableTrait;
 use Illuminate\Notifications\Notification;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use TiMacDonald\ThrottledNotifications\ServiceProvider;
 use TiMacDonald\ThrottledNotifications\Throttleable;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use TiMacDonald\ThrottledNotifications\ServiceProvider;
+use Illuminate\Notifications\Notifiable as NotifiableTrait;
 
 class TestCase extends BaseTestCase
 {
@@ -18,7 +20,7 @@ class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/migrations');
 
         $this->withFactories(__DIR__.'/factories');
 
@@ -45,4 +47,3 @@ class Notifiable extends Model
 {
     use NotifiableTrait;
 }
-

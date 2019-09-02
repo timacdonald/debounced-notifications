@@ -1,22 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TiMacDonald\ThrottledNotifications;
 
+use stdClass;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\JoinClause;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use stdClass;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 class SendThrottledNotifications implements ShouldQueue
 {
@@ -24,7 +22,7 @@ class SendThrottledNotifications implements ShouldQueue
 
     public function handle(Dispatcher $bus): void
     {
-        $this->notifiables()->each(function (stdClass $notifiable) use ($bus) {
+        $this->notifiables()->each(function (stdClass $notifiable) use ($bus): void {
             $bus->dispatch(new SendThrottledNotificationsToNotifiable($this->hydrate($notifiable)));
         });
     }
@@ -76,7 +74,7 @@ class SendThrottledNotifications implements ShouldQueue
         return [
             $this->throttledNotifications(),
             'throttled_notifications',
-            function (JoinClause $join) {
+            static function (JoinClause $join): void {
                 $join->on('notifications.id', '=', 'throttled_notifications.notification_id');
             },
         ];
@@ -84,7 +82,7 @@ class SendThrottledNotifications implements ShouldQueue
 
     private function hydrate(stdClass $notifiable): Model
     {
-        return tap($notifiable->type::newModelInstance(), function (Model $instance) use ($notifiable) {
+        return tap($notifiable->type::newModelInstance(), static function (Model $instance) use ($notifiable): void {
             $instance->forceFill([$instance->getKeyName() => $notifiable->id]);
         });
     }

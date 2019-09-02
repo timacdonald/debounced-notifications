@@ -1,12 +1,13 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+declare(strict_types=1);
 
 use Tests\Notifiable;
 use Faker\Generator as Faker;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 
-$factory->define(DatabaseNotification::class, function (Faker $faker) {
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+$factory->define(DatabaseNotification::class, static function (Faker $faker) {
     return [
         'id' => $faker->unique()->uuid,
         'type' => '',
@@ -16,7 +17,7 @@ $factory->define(DatabaseNotification::class, function (Faker $faker) {
     ];
 });
 
-$factory->state(DatabaseNotification::class, 'read', function (Faker $faker) {
+$factory->state(DatabaseNotification::class, 'read', static function (Faker $faker) {
     return [
         'read_at' => $faker->dateTime,
     ];

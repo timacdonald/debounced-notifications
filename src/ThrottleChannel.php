@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TiMacDonald\ThrottledNotifications;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
-use Illuminate\Notifications\Notification;
 
 class ThrottleChannel
 {

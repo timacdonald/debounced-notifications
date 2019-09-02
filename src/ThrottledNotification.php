@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TiMacDonald\ThrottledNotifications;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notification;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ThrottledNotification extends Model
 {
