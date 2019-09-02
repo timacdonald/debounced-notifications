@@ -28,7 +28,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "TiMacDonald\\NotificationThrottle\\ServiceProvider"
+                "TiMacDonald\\ThrottledNotifications\\ServiceProvider"
             ]
         }
     },
