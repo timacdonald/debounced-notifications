@@ -1,7 +1,12 @@
 <?xml version="1.0"?>
 <psalm
     totallyTyped="false"
+    strictBinaryOperands="true"
     resolveFromConfigFile="true"
+    allowStringToStandInForClass="true"
+    ignoreInternalFunctionFalseReturn="false"
+    ignoreInternalFunctionNullReturn="false"
+    findUnusedVariablesAndParams="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -14,5 +19,12 @@
     </projectFiles>
 
     <issueHandlers>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <file name="src/DatabaseNotification.php" />
+                <file name="src/ThrottledNotification.php" />
+                <file name="src/SendThrottledNotificationsToNotifiable.php" />
+            </errorLevel>
+        </PropertyNotSetInConstructor>
     </issueHandlers>
 </psalm>
