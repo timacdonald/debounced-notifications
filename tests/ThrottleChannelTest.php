@@ -47,7 +47,7 @@ class ThrottleChannelTest extends TestCase
         $this->app[ChannelManager::class]->send($notifiable, $notification);
 
         // assert
-        $this->assertSame(1, ThrottledNotification::whereNotDelayed()->count());
+        $this->assertSame(1, ThrottledNotification::whereNull('delayed_until')->count());
     }
 
     public function testDelayedIfNotifiableImplementsDelayUntilMethodWithFutureDate(): void
@@ -68,8 +68,8 @@ class ThrottleChannelTest extends TestCase
         $this->app[ChannelManager::class]->send($notifiable, $notification);
 
         // assert
-        $this->assertCount(1, $notifications = ThrottledNotification::whereDelayed()->get());
-        $this->assertSame('2019-09-11 12:51:00', $notifications[0]->delayed_until->format('Y-m-d H:i:s'));
+        $this->assertCount(1, $notifications = ThrottledNotification::whereNotNull('delayed_until')->get());
+        $this->assertSame('2019-09-11 12:51:00', $notifications[0]->delayed_until);
     }
 
     public function testNotDelayedIfNotifiableImplementsDelayUntilMethodWithNow(): void
@@ -90,7 +90,26 @@ class ThrottleChannelTest extends TestCase
         $this->app[ChannelManager::class]->send($notifiable, $notification);
 
         // assert
-        $this->assertSame(1, ThrottledNotification::whereNotDelayed()->count());
+        $this->assertSame(1, ThrottledNotification::whereNull('delayed_until')->count());
+    }
+
+    public function testNotDelayedIfNotifiableImplementsDelayUntilMethodWithNull(): void
+    {
+        // arrange
+        $notifiable = new class() extends Notifiable {
+            protected $attributes = ['id' => 54321];
+
+            public function delayNotificationsUntil(): void
+            {
+            }
+        };
+        $notification = new DummyThrottledNotification();
+
+        // act
+        $this->app[ChannelManager::class]->send($notifiable, $notification);
+
+        // assert
+        $this->assertSame(1, ThrottledNotification::whereNull('delayed_until')->count());
     }
 
     public function testNotDelayedIfNotifiableImplementsDelayUntilMethodWithPastDate(): void
@@ -111,6 +130,6 @@ class ThrottleChannelTest extends TestCase
         $this->app[ChannelManager::class]->send($notifiable, $notification);
 
         // assert
-        $this->assertSame(1, ThrottledNotification::whereNotDelayed()->count());
+        $this->assertSame(1, ThrottledNotification::whereNull('delayed_until')->count());
     }
 }

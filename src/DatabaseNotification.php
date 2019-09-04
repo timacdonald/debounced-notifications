@@ -13,4 +13,14 @@ class DatabaseNotification extends BaseDatabaseNotification
     {
         $builder->whereNull('read_at');
     }
+
+    public function scopeGroupByNotifiable(Builder $builder): void
+    {
+        $builder->groupBy(['notifiable_type', 'notifiable_id']);
+    }
+
+    public function scopeOrderByOldest(Builder $builder): void
+    {
+        $builder->oldest('notifications.created_at');
+    }
 }

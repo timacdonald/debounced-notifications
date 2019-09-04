@@ -17,13 +17,6 @@ class ThrottledNotification extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @var array
-     */
-    protected $casts = [
-        'delayed_until' => 'datetime',
-    ];
-
     public function databaseNotification(): BelongsTo
     {
         return $this->belongsTo(DatabaseNotification::class, 'notification_id');
@@ -39,28 +32,23 @@ class ThrottledNotification extends Model
         return \unserialize($value);
     }
 
-    public function scopeWhereNotReserved(Builder $builder): void
-    {
-        $builder->whereNull('reserved_key');
-    }
-
     public function scopeWhereUnsent(Builder $builder): void
     {
         $builder->whereNull('sent_at');
     }
 
+    public function scopeWhereCreatedBefore(Builder $builder, Carbon $date): void
+    {
+        $builder->where('throttled_notifications.created_at', '<', $date);
+    }
+
+    public function scopeWhereUnreserved(Builder $builder): void
+    {
+        $builder->whereNull('reserved_key');
+    }
+
     public function scopeWhereNotDelayed(Builder $builder): void
     {
         $builder->whereNull('delayed_until');
-    }
-
-    public function scopeWhereDelayed(Builder $builder): void
-    {
-        $builder->whereNotNull('delayed_until');
-    }
-
-    public function scopeWhereCreatedBefore(Builder $builder, Carbon $date): void
-    {
-        $builder->where('created_at', '<', $date);
     }
 }
