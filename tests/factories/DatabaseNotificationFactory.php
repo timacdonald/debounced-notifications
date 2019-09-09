@@ -6,7 +6,6 @@ use Tests\Notifiable;
 use Faker\Generator as Faker;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(DatabaseNotification::class, static function (Faker $faker) {
     return [
         'id' => $faker->unique()->uuid,

@@ -24,9 +24,4 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
     {
         $this->notifiable = $notifiable;
     }
-
-    public function notifiable(): Model
-    {
-        return $this->notifiable;
-    }
 }

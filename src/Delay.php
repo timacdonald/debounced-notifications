@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class Delay
 {
-    public static function determine(object $object): ?Carbon
+    public static function until(object $object): ?Carbon
     {
         $date = static::asDate($object);
 
@@ -22,7 +22,7 @@ class Delay
     private static function asDate(object $object): Carbon
     {
         if (\method_exists($object, 'delayNotificationsUntil')) {
-            return $object->delayNotificationsUntil() ?? Carbon::now();
+            return $object->delayNotificationsUntil();
         }
 
         return Carbon::now();

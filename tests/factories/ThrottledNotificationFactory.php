@@ -7,7 +7,6 @@ use Tests\DummyThrottledNotification;
 use TiMacDonald\ThrottledNotifications\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(ThrottledNotification::class, static function (Faker $faker) {
     return [
         'payload' => new DummyThrottledNotification(),
@@ -24,5 +23,11 @@ $factory->state(ThrottledNotification::class, 'sent', static function (Faker $fa
 $factory->state(ThrottledNotification::class, 'delayed', static function (Faker $faker) {
     return [
         'delayed_until' => $faker->dateTime,
+    ];
+});
+
+$factory->state(ThrottledNotification::class, 'reserved', static function (Faker $faker) {
+    return [
+        'reserved_key' => $faker->uuid,
     ];
 });

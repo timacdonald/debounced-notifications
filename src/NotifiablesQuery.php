@@ -6,13 +6,22 @@ namespace TiMacDonald\ThrottledNotifications;
 
 use Closure;
 use stdClass;
-use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Query\JoinClause;
+use TiMacDonald\ThrottledNotifications\Contracts\Wait;
 
 class NotifiablesQuery
 {
+    /**
+     * @var \TiMacDonald\ThrottledNotifications\Contracts\Wait
+     */
+    private $wait;
+
+    public function __construct(Wait $wait)
+    {
+        $this->wait = $wait;
+    }
+
     public function each(Closure $closure): void
     {
         $this->query()->each(static function (stdClass $record) use ($closure): void {
@@ -45,7 +54,7 @@ class NotifiablesQuery
             ->whereUnsent()
             ->whereNotDelayed()
             ->whereUnreserved()
-            ->whereCreatedBefore($this->wait())
+            ->wherePastWait($this->wait)
             ->toBase();
     }
 
@@ -58,10 +67,5 @@ class NotifiablesQuery
                     ->mergeWheres($builder->wheres, $builder->bindings);
             },
         ];
-    }
-
-    private function wait(): Carbon
-    {
-        return Carbon::now()->subSeconds(Config::get('throttled-notifications.wait'));
     }
 }

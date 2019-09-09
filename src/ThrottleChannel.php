@@ -24,8 +24,8 @@ class ThrottleChannel
     {
         return ThrottledNotification::create([
             'payload' => $notification,
-            'delayed_until' => Delay::determine($notifiable),
-            'notification_id' => $this->databaseChannel->send($notifiable, $notification)->id,
+            'delayed_until' => Delay::until($notifiable),
+            'notification_id' => $this->databaseChannel->send($notifiable, $notification)->getKey(),
         ]);
     }
 }

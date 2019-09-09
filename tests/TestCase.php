@@ -27,7 +27,7 @@ class TestCase extends BaseTestCase
         $this->artisan('migrate')->run();
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [ServiceProvider::class];
     }

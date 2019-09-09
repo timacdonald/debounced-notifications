@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use TiMacDonald\ThrottledNotifications\Contracts\Wait;
 
 class ThrottledNotification extends Model
 {
@@ -37,9 +37,9 @@ class ThrottledNotification extends Model
         $builder->whereNull('sent_at');
     }
 
-    public function scopeWhereCreatedBefore(Builder $builder, Carbon $date): void
+    public function scopeWherePastWait(Builder $builder, Wait $wait): void
     {
-        $builder->where('throttled_notifications.created_at', '<', $date);
+        $builder->where('throttled_notifications.created_at', '<=', $wait->lapsesAt());
     }
 
     public function scopeWhereUnreserved(Builder $builder): void

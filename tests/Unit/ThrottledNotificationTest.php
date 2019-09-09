@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
+use Illuminate\Notifications\Notification;
 use TiMacDonald\ThrottledNotifications\ThrottledNotification;
 
 class ThrottledNotificationTest extends TestCase
@@ -11,7 +13,7 @@ class ThrottledNotificationTest extends TestCase
     public function testPayloadIsSerializedAndDeserialized(): void
     {
         // arrange
-        $notification = new ThrottledNotificationTestDummyNotification('expected value');
+        $notification = new DummyNotificationWithConstructorArgs('expected value');
         $throttledNotification = new ThrottledNotification();
 
         // act
@@ -23,12 +25,15 @@ class ThrottledNotificationTest extends TestCase
     }
 }
 
-class ThrottledNotificationTestDummyNotification extends DummyThrottledNotification
+class DummyNotificationWithConstructorArgs extends Notification
 {
+    /**
+     * @var array
+     */
     public $constructorArgs;
 
-    public function __construct()
+    public function __construct(...$args)
     {
-        $this->constructorArgs = \func_get_args();
+        $this->constructorArgs = $args;
     }
 }
