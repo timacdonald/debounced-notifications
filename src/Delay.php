@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace TiMacDonald\ThrottledNotifications;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Delay
 {
-    public static function until(object $object): ?Carbon
+    public static function until(Model $notifiable): ?Carbon
     {
-        $date = static::asDate($object);
+        $date = static::asDate($notifiable);
 
         if ($date->isFuture()) {
             return $date;
@@ -19,10 +20,10 @@ class Delay
         return null;
     }
 
-    private static function asDate(object $object): Carbon
+    private static function asDate(Model $notifiable): Carbon
     {
-        if (\method_exists($object, 'delayNotificationsUntil')) {
-            return $object->delayNotificationsUntil();
+        if (\method_exists($notifiable, 'delayNotificationsUntil')) {
+            return $notifiable->delayNotificationsUntil();
         }
 
         return Carbon::now();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use stdClass;
+use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use TiMacDonald\ThrottledNotifications\Delay;
@@ -21,7 +21,7 @@ class DelayTest extends TestCase
     public function testDelayedIsNullIfNotifiableDoesntImplementDelayUntilMethod(): void
     {
         // arrange
-        $notifiable = new stdClass();
+        $notifiable = new class() extends Model {};
 
         // act
         $delay = Delay::until($notifiable);
@@ -33,7 +33,7 @@ class DelayTest extends TestCase
     public function testDelayIsExpectedDateIfNotifiableImplementsDelayUntilMethodWithFutureDate(): void
     {
         // arrange
-        $notifiable = new class() extends stdClass {
+        $notifiable = new class() extends Model {
             public function delayNotificationsUntil()
             {
                 return Carbon::now()->addDay();
@@ -50,7 +50,7 @@ class DelayTest extends TestCase
     public function testDelayIsNotIfNotifiableImplementsDelayUntilMethodWithNow(): void
     {
         // arrange
-        $notifiable = new class() extends stdClass {
+        $notifiable = new class() extends Model {
             public function delayNotificationsUntil()
             {
                 return Carbon::now();
@@ -67,7 +67,7 @@ class DelayTest extends TestCase
     public function testDelayIsNullIfNotifiableImplementsDelayUntilMethodWithPastDate(): void
     {
         // arrange
-        $notifiable = new class() extends stdClass {
+        $notifiable = new class() extends Model {
             public function delayNotificationsUntil()
             {
                 return Carbon::now()->subMinute();

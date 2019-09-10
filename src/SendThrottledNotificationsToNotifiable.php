@@ -24,4 +24,9 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
     {
         $this->notifiable = $notifiable;
     }
+
+    public function handle(): void
+    {
+        //
+    }
 }
