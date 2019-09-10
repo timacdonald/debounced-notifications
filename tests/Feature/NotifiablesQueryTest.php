@@ -36,6 +36,30 @@ class NotifiablesQueryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
+    public function testOnlyIncludesOnePerNotifiableThatIsTheOldest(): void
+    {
+        // arrange
+        $databaseNotification = \factory(DatabaseNotification::class)->create();
+        \factory(ThrottledNotification::class)->create([
+            'notification_id' => $databaseNotification->id,
+        ]);
+        Carbon::setTestNow(Carbon::now()->addMinutes(10));
+        $expected = \factory(ThrottledNotification::class)->create([
+            'notification_id' => $databaseNotification->id,
+        ]);
+        Carbon::setTestNow(Carbon::now()->addMinutes(10));
+
+        // act
+        $result = [];
+        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+            $result[] = $notifiable;
+        });
+
+        // assert
+        $this->assertCount(1, $result);
+        $this->assertTrue($expected->databaseNotification->notifiable->is($result[0]));
+    }
+
     public function testDelayedNotificationsAreIgnored(): void
     {
         // arrange
@@ -82,30 +106,6 @@ class NotifiablesQueryTest extends TestCase
 
         // assert
         $this->assertCount(0, $result);
-    }
-
-    public function testOnlyIncludesOnePerNotifiableThatIsTheOldest(): void
-    {
-        // arrange
-        $databaseNotification = \factory(DatabaseNotification::class)->create();
-        \factory(ThrottledNotification::class)->create([
-            'notification_id' => $databaseNotification->id,
-        ]);
-        Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $expected = \factory(ThrottledNotification::class)->create([
-            'notification_id' => $databaseNotification->id,
-        ]);
-        Carbon::setTestNow(Carbon::now()->addMinutes(10));
-
-        // act
-        $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
-
-        // assert
-        $this->assertCount(1, $result);
-        $this->assertTrue($expected->databaseNotification->notifiable->is($result[0]));
     }
 
     public function testReservedNotificationsAreIgnored(): void
