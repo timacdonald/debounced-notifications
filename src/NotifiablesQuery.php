@@ -9,8 +9,9 @@ use stdClass;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use TiMacDonald\ThrottledNotifications\Contracts\Wait;
+use TiMacDonald\ThrottledNotifications\Contracts\NotifiablesQuery as NotifiablesQueryContract;
 
-class NotifiablesQuery
+class NotifiablesQuery implements NotifiablesQueryContract
 {
     /**
      * @var \TiMacDonald\ThrottledNotifications\Contracts\Wait

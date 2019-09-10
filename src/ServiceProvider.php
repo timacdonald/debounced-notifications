@@ -17,8 +17,10 @@ class ServiceProvider extends BaseServiceProvider
 
     public function register(): void
     {
-        $this->app->bind(\TiMacDonald\ThrottledNotifications\Contracts\Wait::class, static function () {
-            return \TiMacDonald\ThrottledNotifications\Wait::fromMinutes(10);
+        $this->app->bind(Contracts\Wait::class, static function () {
+            return Wait::fromMinutes(10);
         });
+
+        $this->app->bind(Contracts\NotifiablesQuery::class, NotifiablesQuery::class);
     }
 }

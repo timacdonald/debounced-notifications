@@ -11,6 +11,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use TiMacDonald\ThrottledNotifications\Contracts\NotifiablesQuery;
 
 class SendThrottledNotifications implements ShouldQueue
 {
