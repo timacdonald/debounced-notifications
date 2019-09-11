@@ -22,9 +22,9 @@
     <issueHandlers>
         <PropertyNotSetInConstructor>
             <errorLevel type="suppress">
-                <file name="src/DatabaseNotification.php" />
-                <file name="src/ThrottledNotification.php" />
-                <file name="src/SendThrottledNotificationsToNotifiable.php" />
+                <file name="src/Models/DatabaseNotification.php" />
+                <file name="src/Models/ThrottledNotification.php" />
+                <file name="src/Jobs/SendThrottledNotificationsToNotifiable.php" />
             </errorLevel>
         </PropertyNotSetInConstructor>
     </issueHandlers>

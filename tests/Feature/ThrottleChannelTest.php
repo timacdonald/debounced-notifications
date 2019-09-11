@@ -9,7 +9,7 @@ use Tests\Notifiable;
 use Tests\DummyThrottledNotification;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\DatabaseNotification;
-use TiMacDonald\ThrottledNotifications\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
 class ThrottleChannelTest extends TestCase
 {

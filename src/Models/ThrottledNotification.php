@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TiMacDonald\ThrottledNotifications;
+namespace TiMacDonald\ThrottledNotifications\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -47,8 +47,18 @@ class ThrottledNotification extends Model
         $builder->whereNull('reserved_key');
     }
 
+    public function scopeWhereReservationKey(Builder $builder, string $key): void
+    {
+        $builder->where('reserved_key', '=', $key);
+    }
+
     public function scopeWhereNotDelayed(Builder $builder): void
     {
         $builder->whereNull('delayed_until');
+    }
+
+    public function scopeReserve(Builder $builder, string $key): int
+    {
+        return $builder->update(['reserved_key' => $key]);
     }
 }

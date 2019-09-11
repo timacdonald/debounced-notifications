@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Tests\Notifiable;
 use Faker\Generator as Faker;
-use TiMacDonald\ThrottledNotifications\DatabaseNotification;
+use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
 
 $factory->define(DatabaseNotification::class, static function (Faker $faker) {
     return [

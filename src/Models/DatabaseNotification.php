@@ -2,13 +2,20 @@
 
 declare(strict_types=1);
 
-namespace TiMacDonald\ThrottledNotifications;
+namespace TiMacDonald\ThrottledNotifications\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
 
 class DatabaseNotification extends BaseDatabaseNotification
 {
+    public function scopeWhereNotifiable(Builder $builder, Model $notifiable): void
+    {
+        $builder->where('notifiable_type', '=', \get_class($notifiable))
+            ->where('notifiable_id', '=', $notifiable->getKey());
+    }
+
     public function scopeWhereUnread(Builder $builder): void
     {
         $builder->whereNull('read_at');

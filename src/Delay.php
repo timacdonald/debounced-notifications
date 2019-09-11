@@ -6,10 +6,11 @@ namespace TiMacDonald\ThrottledNotifications;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use TiMacDonald\ThrottledNotifications\Contracts\Delay as DelayContract;
 
-class Delay
+class Delay implements DelayContract
 {
-    public static function until(Model $notifiable): ?Carbon
+    public function until(Model $notifiable): ?Carbon
     {
         $date = static::asDate($notifiable);
 

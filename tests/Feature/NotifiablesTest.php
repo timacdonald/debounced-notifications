@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use stdClass;
 use Carbon\Carbon;
 use Tests\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use TiMacDonald\ThrottledNotifications\NotifiablesQuery;
-use TiMacDonald\ThrottledNotifications\DatabaseNotification;
-use TiMacDonald\ThrottledNotifications\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Contracts\Notifiables;
+use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
-class NotifiablesQueryTest extends TestCase
+class NotifiablesTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -28,7 +28,7 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 
@@ -51,13 +51,12 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 
         // assert
         $this->assertCount(1, $result);
-        $this->assertTrue($expected->databaseNotification->notifiable->is($result[0]));
     }
 
     public function testDelayedNotificationsAreIgnored(): void
@@ -68,7 +67,7 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 
@@ -84,7 +83,7 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 
@@ -100,7 +99,7 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 
@@ -116,7 +115,7 @@ class NotifiablesQueryTest extends TestCase
 
         // act
         $result = [];
-        $this->app[NotifiablesQuery::class]->each(static function (Model $notifiable) use (&$result): void {
+        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
             $result[] = $notifiable;
         });
 

@@ -21,6 +21,10 @@ class ServiceProvider extends BaseServiceProvider
             return Wait::fromMinutes(10);
         });
 
-        $this->app->bind(Contracts\NotifiablesQuery::class, NotifiablesQuery::class);
+        $this->app->bind(Contracts\Delay::class, Delay::class);
+
+        $this->app->bind(Contracts\ThrottledNotifications::class, Queries\ThrottledNotifications::class);
+
+        $this->app->bind(Contracts\Notifiables::class, Queries\Notifiables::class);
     }
 }

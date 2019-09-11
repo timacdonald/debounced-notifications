@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use TiMacDonald\ThrottledNotifications\Delay;
 
 class DelayTest extends TestCase
@@ -21,10 +21,11 @@ class DelayTest extends TestCase
     public function testDelayedIsNullIfNotifiableDoesntImplementDelayUntilMethod(): void
     {
         // arrange
-        $notifiable = new class() extends Model {};
+        $notifiable = new class() extends Model {
+        };
 
         // act
-        $delay = Delay::until($notifiable);
+        $delay = (new Delay())->until($notifiable);
 
         // assert
         $this->assertNull($delay);
@@ -41,7 +42,7 @@ class DelayTest extends TestCase
         };
 
         // act
-        $delay = Delay::until($notifiable);
+        $delay = (new Delay())->until($notifiable);
 
         // assert
         $this->assertTrue(Carbon::now()->addDay()->eq($delay));
@@ -58,7 +59,7 @@ class DelayTest extends TestCase
         };
 
         // act
-        $delay = Delay::until($notifiable);
+        $delay = (new Delay())->until($notifiable);
 
         // assert
         $this->assertNull($delay);
@@ -75,7 +76,7 @@ class DelayTest extends TestCase
         };
 
         // act
-        $delay = Delay::until($notifiable);
+        $delay = (new Delay())->until($notifiable);
 
         // assert
         $this->assertNull($delay);

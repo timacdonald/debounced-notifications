@@ -7,9 +7,9 @@ namespace Tests\Feature;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Bus;
-use TiMacDonald\ThrottledNotifications\ThrottledNotification;
-use TiMacDonald\ThrottledNotifications\SendThrottledNotifications;
-use TiMacDonald\ThrottledNotifications\SendThrottledNotificationsToNotifiable;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Jobs\SendThrottledNotifications;
+use TiMacDonald\ThrottledNotifications\Jobs\SendThrottledNotificationsToNotifiable;
 
 class SendThrottledNotificationsTest extends TestCase
 {

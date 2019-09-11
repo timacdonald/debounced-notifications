@@ -7,6 +7,8 @@ namespace TiMacDonald\ThrottledNotifications;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Channels\DatabaseChannel;
+use TiMacDonald\ThrottledNotifications\Contracts\Delay;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
 class ThrottleChannel
 {
@@ -15,16 +17,23 @@ class ThrottleChannel
      */
     private $databaseChannel;
 
-    public function __construct(DatabaseChannel $databaseChannel)
+    /**
+     * @var \TiMacDonald\ThrottledNotifications\Contracts\Delay
+     */
+    private $delay;
+
+    public function __construct(DatabaseChannel $databaseChannel, Delay $delay)
     {
         $this->databaseChannel = $databaseChannel;
+
+        $this->delay = $delay;
     }
 
     public function send(Model $notifiable, Notification $notification): ThrottledNotification
     {
         return ThrottledNotification::create([
             'payload' => $notification,
-            'delayed_until' => Delay::until($notifiable),
+            'delayed_until' => $this->delay->until($notifiable),
             'notification_id' => $this->databaseChannel->send($notifiable, $notification)->getKey(),
         ]);
     }

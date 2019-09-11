@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Faker\Generator as Faker;
 use Tests\DummyThrottledNotification;
-use TiMacDonald\ThrottledNotifications\DatabaseNotification;
-use TiMacDonald\ThrottledNotifications\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
 $factory->define(ThrottledNotification::class, static function (Faker $faker) {
     return [

@@ -6,7 +6,7 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
-use TiMacDonald\ThrottledNotifications\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
 class ThrottledNotificationTest extends TestCase
 {
