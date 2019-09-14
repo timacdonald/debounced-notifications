@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notifiable
 {
+    const KEY_ATTRIBUTE = 'key';
+
+    const TYPE_ATTRIBUTE = 'type';
+
     public static function hydrate(stdClass $record): Model
     {
         return \tap(static::instance($record), static function (Model $instance) use ($record): void {

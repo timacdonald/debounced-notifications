@@ -27,13 +27,10 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(2, $result);
+        $this->assertCount(2, $notifiables);
     }
 
     public function testOnlyIncludesOnePerNotifiableThatIsTheOldest(): void
@@ -50,29 +47,26 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(1, $result);
+        $this->assertCount(1, $notifiables);
     }
 
-    public function testDelayedNotificationsAreIgnored(): void
+    public function testReadNotificationAreIgnored(): void
     {
         // arrange
-        \factory(ThrottledNotification::class)->states(['delayed'])->create();
+        $databaseNotification = factory(DatabaseNotification::class)->states(['read'])->create();
+        \factory(ThrottledNotification::class)->create([
+            'notification_id' => $databaseNotification->id,
+        ]);
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(0, $result);
+        $this->assertCount(0, $notifiables);
     }
 
     public function testSentNotificationsAreIgnored(): void
@@ -82,13 +76,10 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(0, $result);
+        $this->assertCount(0, $notifiables);
     }
 
     public function testNotificationsBeforeWaitTimeHasLaspedAreIgnored(): void
@@ -98,13 +89,10 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(10)->subSecond());
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(0, $result);
+        $this->assertCount(0, $notifiables);
     }
 
     public function testReservedNotificationsAreIgnored(): void
@@ -114,12 +102,9 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
 
         // act
-        $result = [];
-        $this->app[Notifiables::class]->query()->each(static function (stdClass $notifiable) use (&$result): void {
-            $result[] = $notifiable;
-        });
+        $notifiables = $this->app[Notifiables::class]->query()->get();
 
         // assert
-        $this->assertCount(0, $result);
+        $this->assertCount(0, $notifiables);
     }
 }

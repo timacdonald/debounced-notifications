@@ -61,4 +61,9 @@ class ThrottledNotification extends Model
     {
         return $builder->update(['reserved_key' => $key]);
     }
+
+    public function scopeRelease(Builder $builder): int
+    {
+        return $builder->update(['reserved_key' => null]);
+    }
 }

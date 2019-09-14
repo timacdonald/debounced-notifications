@@ -6,54 +6,53 @@ namespace TiMacDonald\ThrottledNotifications\Queries;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
-use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
-use TiMacDonald\ThrottledNotifications\Contracts\ThrottledNotifications;
+use TiMacDonald\ThrottledNotifications\Contracts\Wait;
+use TiMacDonald\ThrottledNotifications\Notifiable;
 use TiMacDonald\ThrottledNotifications\Contracts\Notifiables as NotifiablesContract;
 
 class Notifiables implements NotifiablesContract
 {
     /**
-     * \TiMacDonald\ThrottledNotifications\Contracts\ThrottledNotifications.
+     * \TiMacDonald\ThrottledNotifications\Queries\ThrottledNotifications.
      */
     private $throttledNotifications;
 
-    public function __construct(ThrottledNotifications $throttledNotifications)
+    /**
+     * @var \TiMacDonald\ThrottledNotifications\Queries\DatabaseNotifications
+     */
+    private $databaseNotifications;
+
+    /**
+     * @var \TiMacDonald\ThrottledNotifications\Contracts\Wait
+     */
+    private $wait;
+
+    public function __construct(ThrottledNotifications $throttledNotifications, DatabaseNotifications $databaseNotifications, Wait $wait)
     {
         $this->throttledNotifications = $throttledNotifications;
+
+        $this->databaseNotifications = $databaseNotifications;
+
+        $this->wait = $wait;
     }
 
     public function query(): Builder
     {
-        return $this->databaseNotifications()
-            ->join(...$this->join())
-            ->select([
-                'notifications.notifiable_id as key',
-                'notifications.notifiable_type as type',
-            ]);
-    }
+        $throttledNotifications = $this->throttledNotifications->query()
+            ->wherePastWait($this->wait)
+            ->toBase();
 
-    private function databaseNotifications(): Builder
-    {
-        return DatabaseNotification::query()
-            ->whereUnread()
+        return $this->databaseNotifications->query()
             ->orderByOldest()
             ->groupByNotifiable()
-            ->toBase();
-    }
-
-    private function join(): array
-    {
-        return $this->rawJoin($this->throttledNotifications->query()->toBase());
-    }
-
-    private function rawJoin(Builder $builder): array
-    {
-        return [
-            'throttled_notifications',
-            static function (JoinClause $join) use ($builder): void {
+            ->toBase()
+            ->join('throttled_notifications', static function (JoinClause $join) use ($throttledNotifications): void {
                 $join->on('notifications.id', 'throttled_notifications.notification_id')
-                    ->mergeWheres($builder->wheres, $builder->bindings);
-            },
-        ];
+                    ->mergeWheres($throttledNotifications->wheres, $throttledNotifications->bindings);
+            })
+            ->select([
+                'notifications.notifiable_id as '.Notifiable::KEY_ATTRIBUTE,
+                'notifications.notifiable_type as '.Notifiable::TYPE_ATTRIBUTE,
+            ]);
     }
 }

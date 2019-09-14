@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\ConnectionInterface as Database;
-use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
-use TiMacDonald\ThrottledNotifications\Contracts\ThrottledNotifications;
+use TiMacDonald\ThrottledNotifications\Contracts\Reservables;
 
 class SendThrottledNotificationsToNotifiable implements ShouldQueue
 {
@@ -28,46 +26,28 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
     /**
      * @var string
      */
-    private $reservationKey;
+    private $key;
 
-    public function __construct(Model $notifiable, string $reservationKey)
+    public function __construct(Model $notifiable, string $key)
     {
         $this->notifiable = $notifiable;
 
-        $this->reservationKey = $reservationKey;
+        $this->key = $key;
     }
 
-    public function handle(Database $database, ThrottledNotifications $throttledNotifications): void
+    public function handle(Reservables $reservables): void
     {
-        $count = $database->transaction(function () use ($throttledNotifications): int {
-            return $this->reserve($throttledNotifications);
-        });
+        $count = $reservables->query($this->notifiable)->reserve($this->key);
 
         if ($count === 0) {
             return;
         }
 
-        $this->reserved()
-            ->groupBy('databaseNotification.type');
-        //
+        $reservables->get($this->key);
     }
 
-    private function reserve(ThrottledNotifications $throttledNotifications): int
+    public function failed(Exception $exception): void
     {
-        return $throttledNotifications->query()
-            ->whereHas('notifiable', function (Builder $builder): void {
-                $builder->whereNotifiable($this->notifiable)
-                    ->whereUnread();
-            })
-            ->reserve($this->reservationKey);
-    }
-
-    private function reserved(): Collection
-    {
-        return ThrottledNotification::query()
-            ->whereReservedKey($this->reservationKey)
-            ->oldest()
-            ->with(['databaseNotification:type'])
-            ->get();
+        app(Reservables::class)->release($this->key);
     }
 }
