@@ -22,7 +22,7 @@ class SendThrottledNotifications implements ShouldQueue
     public function handle(Dispatcher $bus, Notifiables $notifiables): void
     {
         $notifiables->query()->each(static function (stdClass $notifiable) use ($bus): void {
-            $bus->dispatch(new SendThrottledNotificationsToNotifiable(Notifiable::hydrate($notifiable), Str::random(32)));
+            $bus->dispatch(new SendThrottledNotificationsToNotifiable(Notifiable::hydrate($notifiable), Str::random(16)));
         });
     }
 }

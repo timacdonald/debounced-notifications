@@ -6,7 +6,6 @@ namespace TiMacDonald\ThrottledNotifications\Jobs;
 
 use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\InteractsWithQueue;
@@ -48,6 +47,6 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
 
     public function failed(Exception $exception): void
     {
-        app(Reservables::class)->release($this->key);
+        \app(Reservables::class)->release($this->key);
     }
 }

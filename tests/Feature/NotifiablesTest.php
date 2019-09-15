@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use stdClass;
 use Carbon\Carbon;
 use Tests\TestCase;
 use TiMacDonald\ThrottledNotifications\Contracts\Notifiables;
@@ -56,7 +55,7 @@ class NotifiablesTest extends TestCase
     public function testReadNotificationAreIgnored(): void
     {
         // arrange
-        $databaseNotification = factory(DatabaseNotification::class)->states(['read'])->create();
+        $databaseNotification = \factory(DatabaseNotification::class)->states(['read'])->create();
         \factory(ThrottledNotification::class)->create([
             'notification_id' => $databaseNotification->id,
         ]);

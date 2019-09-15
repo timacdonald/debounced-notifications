@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use TiMacDonald\ThrottledNotifications\Contracts\Wait;
+use TiMacDonald\ThrottledNotifications\NotificationPayload;
 
 class ThrottledNotification extends Model
 {
@@ -29,7 +31,7 @@ class ThrottledNotification extends Model
 
     protected function getPayloadAttribute(string $value): Notification
     {
-        return \unserialize($value);
+        return NotificationPayload::getInstance()->unserialize($value);
     }
 
     public function scopeWhereUnsent(Builder $builder): void
@@ -65,5 +67,12 @@ class ThrottledNotification extends Model
     public function scopeRelease(Builder $builder): int
     {
         return $builder->update(['reserved_key' => null]);
+    }
+
+    public function scopeWhereHasDatabaseNotifications(Builder $builder, QueryBuilder $databaseNotifications): void
+    {
+        $builder->whereHas('databaseNotification', static function (Builder $builder) use ($databaseNotifications): void {
+            $builder->mergeWheres($databaseNotifications->wheres, $databaseNotifications->bindings);
+        });
     }
 }

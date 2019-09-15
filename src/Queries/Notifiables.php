@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace TiMacDonald\ThrottledNotifications\Queries;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\JoinClause;
 use TiMacDonald\ThrottledNotifications\Contracts\Wait;
-use TiMacDonald\ThrottledNotifications\Notifiable;
 use TiMacDonald\ThrottledNotifications\Contracts\Notifiables as NotifiablesContract;
 
 class Notifiables implements NotifiablesContract
@@ -38,21 +36,18 @@ class Notifiables implements NotifiablesContract
 
     public function query(): Builder
     {
-        $throttledNotifications = $this->throttledNotifications->query()
-            ->wherePastWait($this->wait)
-            ->toBase();
-
         return $this->databaseNotifications->query()
             ->orderByOldest()
             ->groupByNotifiable()
-            ->toBase()
-            ->join('throttled_notifications', static function (JoinClause $join) use ($throttledNotifications): void {
-                $join->on('notifications.id', 'throttled_notifications.notification_id')
-                    ->mergeWheres($throttledNotifications->wheres, $throttledNotifications->bindings);
-            })
-            ->select([
-                'notifications.notifiable_id as '.Notifiable::KEY_ATTRIBUTE,
-                'notifications.notifiable_type as '.Notifiable::TYPE_ATTRIBUTE,
-            ]);
+            ->selectNotifiable()
+            ->joinThrottledNotifications($this->throttledNotifications())
+            ->toBase();
+    }
+
+    private function throttledNotifications(): Builder
+    {
+        return $this->throttledNotifications->query()
+            ->wherePastWait($this->wait)
+            ->toBase();
     }
 }

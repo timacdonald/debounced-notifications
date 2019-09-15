@@ -7,6 +7,7 @@ namespace TiMacDonald\ThrottledNotifications\Queries;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 use TiMacDonald\ThrottledNotifications\Contracts\Reservables as ReservablesContract;
 
@@ -31,18 +32,8 @@ class Reservables implements ReservablesContract
 
     public function query(Model $notifiable): Builder
     {
-        $databaseNotifications = $this->databaseNotifications->query()->toBase();
-
         return $this->throttledNotifications->query()
-            ->whereHas('databaseNotification', static function (Builder $builder) use ($notifiable, $databaseNotifications): void {
-                $builder->whereNotifiable($notifiable)
-                    ->mergeWheres($databaseNotifications->wheres, $databaseNotifications->bindings);
-            });
-    }
-
-    public function release(string $key): void
-    {
-        $this->reserved($key)->release();
+            ->whereHasDatabaseNotifications($this->databaseNotifications($notifiable));
     }
 
     public function get(string $key): Collection
@@ -53,9 +44,21 @@ class Reservables implements ReservablesContract
             ->get();
     }
 
+    public function release(string $key): void
+    {
+        $this->reserved($key)->release();
+    }
+
     private function reserved(string $key): Builder
     {
         return ThrottledNotification::query()
             ->whereReservedKey($key);
+    }
+
+    private function databaseNotifications(Model $notifiable): QueryBuilder
+    {
+        return $this->databaseNotifications->query()
+            ->whereNotifiable($notifiable)
+            ->toBase();
     }
 }

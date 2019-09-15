@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use Tests\TestCase;
 use Tests\Notifiable;
+use TiMacDonald\ThrottledNotifications\Queries\Reservables;
 use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
-use TiMacDonald\ThrottledNotifications\Queries\Reservables;
 
 class ReservablesTest extends TestCase
 {
     public function testNotificationsAreInlcuded(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->create();
+        $notification = \factory(ThrottledNotification::class)->create();
 
         // act
         $notifications = $this->app[Reservables::class]->query($notification->databaseNotification->notifiable)->get();
@@ -25,11 +27,13 @@ class ReservablesTest extends TestCase
     public function testNotificationsForOtherNotifiablesAreIgnored(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->create();
-        $notifiable = factory(Notifiable::class)->create();
+        $notification = \factory(ThrottledNotification::class)->create();
+        $notifiable = \factory(Notifiable::class)->create();
 
         // act
-        $notifications = $this->app[Reservables::class]->query($notifiable)->get();
+        $notifications = $this->app[Reservables::class]
+            ->query($notifiable)
+            ->get();
 
         // assert
         $this->assertCount(0, $notifications);
@@ -62,7 +66,7 @@ class ReservablesTest extends TestCase
     public function testReadNotificationAreIgnored(): void
     {
         // arrange
-        $databaseNotification = factory(DatabaseNotification::class)->states(['read'])->create();
+        $databaseNotification = \factory(DatabaseNotification::class)->states(['read'])->create();
         \factory(ThrottledNotification::class)->create([
             'notification_id' => $databaseNotification->id,
         ]);
@@ -89,7 +93,7 @@ class ReservablesTest extends TestCase
     public function testNotificationsWithDifferentKeyAreNotReleased(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->states(['reserved'])->create();
+        $notification = \factory(ThrottledNotification::class)->states(['reserved'])->create();
 
         // act
         $notifications = $this->app[Reservables::class]->release('xxxx');
@@ -101,7 +105,7 @@ class ReservablesTest extends TestCase
     public function testNotificationsAreReleased(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->states(['reserved'])->create();
+        $notification = \factory(ThrottledNotification::class)->states(['reserved'])->create();
 
         // act
         $notifications = $this->app[Reservables::class]->release($notification->reserved_key);
@@ -113,7 +117,7 @@ class ReservablesTest extends TestCase
     public function testReservedNotificationsAreRetrieved(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->states(['reserved'])->create();
+        $notification = \factory(ThrottledNotification::class)->states(['reserved'])->create();
 
         // act
         $notifications = $this->app[Reservables::class]->get($notification->reserved_key);
@@ -125,7 +129,7 @@ class ReservablesTest extends TestCase
     public function testReservedNotificationWithAnotherKeyAreNotRetrieved(): void
     {
         // arrange
-        $notification = factory(ThrottledNotification::class)->states(['reserved'])->create();
+        $notification = \factory(ThrottledNotification::class)->states(['reserved'])->create();
 
         // act
         $notifications = $this->app[Reservables::class]->get('xxxx');
