@@ -1,4 +1,4 @@
-This is a WIP. Release coming soon.
+This is a WIP. Actualy docs and 1.0 release coming soon.
 
 ## My Notes
 - No config. Container binding is the config.
