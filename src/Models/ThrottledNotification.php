@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notification;
@@ -67,6 +68,11 @@ class ThrottledNotification extends Model
     public function scopeRelease(Builder $builder): int
     {
         return $builder->update(['reserved_key' => null]);
+    }
+
+    public function scopeMarkAsSent(Builder $builder): int
+    {
+        return $builder->update(['sent_at' => Carbon::now()]);
     }
 
     public function scopeWhereHasDatabaseNotifications(Builder $builder, QueryBuilder $databaseNotifications): void

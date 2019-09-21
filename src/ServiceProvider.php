@@ -23,6 +23,8 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->app->bind(Contracts\Delay::class, Delay::class);
 
+        $this->app->bind(Contracts\Notification::class, Notification::class);
+
         $this->app->bind(Contracts\Notifiables::class, Queries\Notifiables::class);
 
         $this->app->bind(Contracts\Reservables::class, Queries\Reservables::class);

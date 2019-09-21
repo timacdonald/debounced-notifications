@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Queries;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use TiMacDonald\ThrottledNotifications\Contracts\Wait;
 use TiMacDonald\ThrottledNotifications\Contracts\Notifiables as NotifiablesContract;
 
@@ -40,14 +40,12 @@ class Notifiables implements NotifiablesContract
             ->orderByOldest()
             ->groupByNotifiable()
             ->selectNotifiable()
-            ->joinThrottledNotifications($this->throttledNotifications())
-            ->toBase();
+            ->joinThrottledNotifications($this->throttledNotifications()->toBase());
     }
 
     private function throttledNotifications(): Builder
     {
         return $this->throttledNotifications->query()
-            ->wherePastWait($this->wait)
-            ->toBase();
+            ->wherePastWait($this->wait);
     }
 }

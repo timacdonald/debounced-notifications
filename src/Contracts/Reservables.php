@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Contracts;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use TiMacDonald\ThrottledNotifications\ThrottledNotificationCollection;
 
 interface Reservables
 {
@@ -14,5 +14,7 @@ interface Reservables
 
     public function release(string $key): void;
 
-    public function get(string $key): Collection;
+    public function get(string $key): ThrottledNotificationCollection;
+
+    public function markAsSent(string $key): void;
 }

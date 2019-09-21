@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use TiMacDonald\ThrottledNotifications\Contracts\Reservables;
+use TiMacDonald\ThrottledNotifications\Contracts\Notification;
 
 class SendThrottledNotificationsToNotifiable implements ShouldQueue
 {
@@ -34,7 +35,7 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
         $this->key = $key;
     }
 
-    public function handle(Reservables $reservables): void
+    public function handle(Reservables $reservables, Notification $notification): void
     {
         $count = $reservables->query($this->notifiable)->reserve($this->key);
 
@@ -42,11 +43,13 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
             return;
         }
 
-        $reservables->get($this->key);
+        $notification->send($reservables->get($this->key));
+
+        $reservables->markAsSent($this->key);
     }
 
     public function failed(Exception $exception): void
     {
-        \app(Reservables::class)->release($this->key);
+        \resolve(Reservables::class)->release($this->key);
     }
 }

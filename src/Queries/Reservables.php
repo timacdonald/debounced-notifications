@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Queries;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\ThrottledNotificationCollection;
 use TiMacDonald\ThrottledNotifications\Contracts\Reservables as ReservablesContract;
 
 class Reservables implements ReservablesContract
@@ -33,32 +32,34 @@ class Reservables implements ReservablesContract
     public function query(Model $notifiable): Builder
     {
         return $this->throttledNotifications->query()
-            ->whereHasDatabaseNotifications($this->databaseNotifications($notifiable));
+            ->whereHasDatabaseNotifications($this->databaseNotifications($notifiable)->toBase());
     }
 
-    public function get(string $key): Collection
+    public function get(string $key): ThrottledNotificationCollection
     {
-        return $this->reserved($key)
-            ->oldest()
-            ->with(['databaseNotification:type'])
-            ->get();
+        return new ThrottledNotificationCollection($this->reservedThrottledNotifications($key)->get());
     }
 
     public function release(string $key): void
     {
-        $this->reserved($key)->release();
+        $this->reservedThrottledNotifications($key)->release();
     }
 
-    private function reserved(string $key): Builder
+    public function markAsSent(string $key): void
+    {
+        $this->reservedThrottledNotifications($key)->markAsSent();
+    }
+
+    private function reservedThrottledNotifications(string $key): Builder
     {
         return ThrottledNotification::query()
-            ->whereReservedKey($key);
+            ->whereReservedKey($key)
+            ->oldest();
     }
 
-    private function databaseNotifications(Model $notifiable): QueryBuilder
+    private function databaseNotifications(Model $notifiable): Builder
     {
         return $this->databaseNotifications->query()
-            ->whereNotifiable($notifiable)
-            ->toBase();
+            ->whereNotifiable($notifiable);
     }
 }
