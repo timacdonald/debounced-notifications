@@ -25,6 +25,7 @@
                 <file name="src/Models/DatabaseNotification.php" />
                 <file name="src/Models/ThrottledNotification.php" />
                 <file name="src/Jobs/SendThrottledNotificationsToNotifiable.php" />
+                <file name="src/Notification.php" />
             </errorLevel>
         </PropertyNotSetInConstructor>
     </issueHandlers>
