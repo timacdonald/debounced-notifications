@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "orchestra/testbench": "^3.0",
+        "orchestra/testbench": "^4.6",
         "phpunit/phpunit": "^8.0"
     },
     "autoload": {
