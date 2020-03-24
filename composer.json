@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "orchestra/testbench": "^3.0",
+        "orchestra/testbench": "^4.7",
         "phpunit/phpunit": "^8.0"
     },
     "autoload": {
@@ -34,7 +34,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
-        "phpstan/phpstan": "^0.11.15",
+        "phpstan/phpstan": "^0.12.18",
         "vimeo/psalm": "^3.4"
     },
     "scripts": {
