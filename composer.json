@@ -36,5 +36,13 @@
         "friendsofphp/php-cs-fixer": "^2.15",
         "phpstan/phpstan": "^0.11.15",
         "vimeo/psalm": "^3.4"
+    },
+    "scripts": {
+        "lint": [
+            "./vendor/bin/php-cs-fixer fix",
+            "./vendor/bin/phpstan analyse",
+            "./vendor/bin/psalm"
+        ],
+        "test": "./vendor/bin/phpunit"
     }
 }
