@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "infection/infection": "^0.16.1",
         "orchestra/testbench": "^5.0",
         "phpunit/phpunit": "^9.0"
     },
@@ -52,7 +53,8 @@
         ],
         "test": [
             "clear",
-            "./vendor/bin/phpunit"
+            "./vendor/bin/phpunit",
+            "./vendor/bin/infection --threads=4"
         ]
     }
 }
