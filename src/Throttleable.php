@@ -13,7 +13,7 @@ trait Throttleable
         return [ThrottleChannel::class];
     }
 
-    public function toArray(Model $notifiable): array
+    public function toArray(): array
     {
         return [];
     }

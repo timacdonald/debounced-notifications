@@ -12,7 +12,7 @@ use TiMacDonald\ThrottledNotifications\Contracts\Courier as CourierContract;
 class Courier implements CourierContract
 {
     /**
-     * \Illuminate\Contracts\Notifications\Dispatcher.
+     * @var \Illuminate\Contracts\Notifications\Dispatcher
      */
     private $dispatcher;
 
@@ -25,9 +25,9 @@ class Courier implements CourierContract
     {
         $throttledNotifications
             ->groupByChannel($notifiable)
-            ->map(static function (ThrottledNotificationCollection $throttledNotifications, string $channel): void {
+            // ->map(static function (ThrottledNotificationCollection $throttledNotifications, string $channel): void {
                 // return $notification->groupByType();
-            })->each(function (Notification $notification) use ($notifiable): void {
+            ->each(function (Notification $notification) use ($notifiable): void {
                 $this->dispatcher->send($notifiable, $notification);
             });
     }

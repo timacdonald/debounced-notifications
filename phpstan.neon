@@ -1,4 +1,14 @@
 parameters:
+    checkMissingIterableValueType: false
     level: max
     paths:
         - src
+        - tests
+    ignoreErrors:
+        -
+            message: '#Undefined variable: \$factory#'
+            path: 'tests/factories'
+        - '#Call to an undefined method TiMacDonald\\ThrottledNotifications\\Builders\\[a-zA-Z]+Builder::[a-zA-Z]+()#'
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder::[a-zA-Z]+()#'
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\[a-zA-Z]+::[a-zA-Z]+()#'
+        - '#Parameter \#1 $key of method TiMacDonald\\ThrottledNotifications\\Queries\\Reservables::[a-zA-z]+() expects string, string|null given.#'

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <psalm
-    totallyTyped="false"
+    errorLevel="1"
     strictBinaryOperands="true"
     resolveFromConfigFile="true"
     allowStringToStandInForClass="true"
-    ignoreInternalFunctionFalseReturn="false"
     ignoreInternalFunctionNullReturn="false"
     findUnusedVariablesAndParams="true"
+    ensureArrayStringOffsetsExist="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -14,6 +14,7 @@
     <projectFiles>
         <directory name="migrations" />
         <directory name="src" />
+        <directory name="tests" />
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>
@@ -22,11 +23,21 @@
     <issueHandlers>
         <PropertyNotSetInConstructor>
             <errorLevel type="suppress">
+                <directory name="tests/Feature" />
+                <directory name="tests/Unit" />
+                <file name="src/Builders/DatabaseNotificationBuilder.php" />
+                <file name="src/Builders/ThrottledNotificationBuilder.php" />
+                <file name="src/Jobs/SendThrottledNotificationsToNotifiable.php" />
                 <file name="src/Models/DatabaseNotification.php" />
                 <file name="src/Models/ThrottledNotification.php" />
-                <file name="src/Jobs/SendThrottledNotificationsToNotifiable.php" />
-                <file name="src/Notification.php" />
+                <file name="tests/Notifiable.php" />
+                <file name="tests/TestCase.php" />
             </errorLevel>
         </PropertyNotSetInConstructor>
+        <UndefinedGlobalVariable>
+            <errorLevel type="suppress">
+                <directory name="tests/factories" />
+            </errorLevel>
+        </UndefinedGlobalVariable>
     </issueHandlers>
 </psalm>

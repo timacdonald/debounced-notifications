@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Tests\Notifiable;
-use Tests\DummyThrottledNotification;
+use Tests\Notification;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Notifications\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
@@ -17,25 +17,36 @@ class ThrottleChannelTest extends TestCase
     {
         // arrange
         $notifiable = \factory(Notifiable::class)->create();
-        $notification = new DummyThrottledNotification();
+        \assert($notifiable instanceof Notifiable);
+        $notification = new Notification();
 
         // act
-        $this->app[ChannelManager::class]->send($notifiable, $notification);
+        $this->channelManager()->send($notifiable, $notification);
 
         // assert
-        $this->assertSame(1, DatabaseNotification::count());
+        $this->assertSame(1, DatabaseNotification::query()->count());
     }
 
     public function testThrottledNotificationIsCreated(): void
     {
         // arrange
         $notifiable = \factory(Notifiable::class)->create();
-        $notification = new DummyThrottledNotification();
+        \assert($notifiable instanceof Notifiable);
+        $notification = new Notification();
 
         // act
-        $this->app[ChannelManager::class]->send($notifiable, $notification);
+        $this->channelManager()->send($notifiable, $notification);
 
         // assert
-        $this->assertSame(1, ThrottledNotification::count());
+        $this->assertSame(1, ThrottledNotification::query()->count());
+    }
+
+    private function channelManager(): ChannelManager
+    {
+        $channelManager = $this->app[ChannelManager::class];
+
+        \assert($channelManager instanceof ChannelManager);
+
+        return $channelManager;
     }
 }

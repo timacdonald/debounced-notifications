@@ -15,15 +15,20 @@ class Notifiable
 
     public static function hydrate(stdClass $record): Model
     {
-        return \tap(static::instance($record), static function (Model $instance) use ($record): void {
-            $instance->forceFill([$instance->getKeyName() => $record->{static::KEY_ATTRIBUTE}]);
-        });
-    }
+        \assert(\property_exists($record, self::TYPE_ATTRIBUTE));
 
-    private static function instance(stdClass $record): Model
-    {
-        $class = Model::getActualClassNameForMorph($record->{static::TYPE_ATTRIBUTE});
+        \assert(\property_exists($record, self::KEY_ATTRIBUTE));
 
-        return $class::newModelInstance();
+        $type = $record->{self::TYPE_ATTRIBUTE};
+
+        \assert(\is_string($type));
+
+        $class = Model::getActualClassNameForMorph($type);
+
+        $instance = $class::newModelInstance();
+
+        \assert($instance instanceof Model);
+
+        return $instance->forceFill([$instance->getKeyName() => $record->{static::KEY_ATTRIBUTE}]);
     }
 }

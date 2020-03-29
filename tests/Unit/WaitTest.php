@@ -10,16 +10,10 @@ use TiMacDonald\ThrottledNotifications\Wait;
 
 class WaitTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     public function testWaitTimeCanBeConfigured(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $wait = new Wait(54321);
         $expected = Carbon::now()->subSeconds(54321);
 
@@ -33,6 +27,7 @@ class WaitTest extends TestCase
     public function testCanUseStaticConstructorToSetInMinutes(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $expected = new Wait(54321 * 60);
 
         // act

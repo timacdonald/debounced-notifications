@@ -11,16 +11,10 @@ use TiMacDonald\ThrottledNotifications\Delay;
 
 class DelayTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     public function testDelayedIsNullIfNotifiableDoesntImplementDelayUntilMethod(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $notifiable = new class() extends Model {
         };
 
@@ -34,8 +28,9 @@ class DelayTest extends TestCase
     public function testDelayIsExpectedDateIfNotifiableImplementsDelayUntilMethodWithFutureDate(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $notifiable = new class() extends Model {
-            public function delayNotificationsUntil()
+            public function delayNotificationsUntil(): Carbon
             {
                 return Carbon::now()->addDay();
             }
@@ -51,8 +46,9 @@ class DelayTest extends TestCase
     public function testDelayIsNotIfNotifiableImplementsDelayUntilMethodWithNow(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $notifiable = new class() extends Model {
-            public function delayNotificationsUntil()
+            public function delayNotificationsUntil(): Carbon
             {
                 return Carbon::now();
             }
@@ -68,8 +64,9 @@ class DelayTest extends TestCase
     public function testDelayIsNullIfNotifiableImplementsDelayUntilMethodWithPastDate(): void
     {
         // arrange
+        Carbon::setTestNow(Carbon::now());
         $notifiable = new class() extends Model {
-            public function delayNotificationsUntil()
+            public function delayNotificationsUntil(): Carbon
             {
                 return Carbon::now()->subMinute();
             }

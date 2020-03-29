@@ -24,7 +24,11 @@ class Delay implements DelayContract
     private static function asDate(Model $notifiable): Carbon
     {
         if (\method_exists($notifiable, 'delayNotificationsUntil')) {
-            return $notifiable->delayNotificationsUntil();
+            $date = $notifiable->delayNotificationsUntil();
+
+            \assert($date instanceof Carbon);
+
+            return $date;
         }
 
         return Carbon::now();

@@ -4,81 +4,86 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Models;
 
-use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use TiMacDonald\ThrottledNotifications\Contracts\Wait;
-use TiMacDonald\ThrottledNotifications\NotificationPayload;
+use TiMacDonald\ThrottledNotifications\Contracts\Throttleable;
+use TiMacDonald\ThrottledNotifications\Builders\ThrottledNotificationBuilder;
 
+/**
+ * Attributes.
+ *
+ * @property string $id
+ * @property \Carbon\Carbon|null $delayed_until
+ * @property \Carbon\Carbon|null $sent_at
+ * @property \TiMacDonald\ThrottledNotifications\Contracts\Throttleable $payload
+ * @property string|null $reserved_key
+ *
+ * Relationships
+ * @property \TiMacDonald\ThrottledNotifications\Models\DatabaseNotification $databaseNotification
+ */
 class ThrottledNotification extends Model
 {
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string
+     */
+    protected $keyType = 'string';
+
     /**
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * @var array
+     */
+    protected $casts = [
+        'sent_at' => 'datetime',
+        'delayed_until' => 'datetime',
+    ];
+
+    protected static function booted(): void
+    {
+        static::creating(static function (self $instance): void {
+            $instance->id = Str::uuid()->toString();
+        });
+    }
 
     public function databaseNotification(): BelongsTo
     {
         return $this->belongsTo(DatabaseNotification::class, 'notification_id');
     }
 
-    protected function setPayloadAttribute(Notification $notification): void
+    protected function setPayloadAttribute(Throttleable $notification): void
     {
         $this->attributes['payload'] = \serialize($notification);
     }
 
-    protected function getPayloadAttribute(string $value): Notification
+    protected function getPayloadAttribute(string $value): Throttleable
     {
-        return NotificationPayload::getInstance()->unserialize($value);
+        $notification = \unserialize($value);
+
+        \assert($notification instanceof Throttleable);
+
+        return $notification;
     }
 
-    public function scopeWhereUnsent(Builder $builder): void
+    public static function query(): ThrottledNotificationBuilder
     {
-        $builder->whereNull('sent_at');
+        $query = parent::query();
+
+        \assert($query instanceof ThrottledNotificationBuilder);
+
+        return $query;
     }
 
-    public function scopeWherePastWait(Builder $builder, Wait $wait): void
+    public function newEloquentBuilder($query): ThrottledNotificationBuilder
     {
-        $builder->where('throttled_notifications.created_at', '<=', $wait->lapsesAt());
-    }
-
-    public function scopeWhereUnreserved(Builder $builder): void
-    {
-        $builder->whereNull('reserved_key');
-    }
-
-    public function scopeWhereReservationKey(Builder $builder, string $key): void
-    {
-        $builder->where('reserved_key', '=', $key);
-    }
-
-    public function scopeWhereNotDelayed(Builder $builder): void
-    {
-        $builder->whereNull('delayed_until');
-    }
-
-    public function scopeReserve(Builder $builder, string $key): int
-    {
-        return $builder->update(['reserved_key' => $key]);
-    }
-
-    public function scopeRelease(Builder $builder): int
-    {
-        return $builder->update(['reserved_key' => null]);
-    }
-
-    public function scopeMarkAsSent(Builder $builder): int
-    {
-        return $builder->update(['sent_at' => Carbon::now()]);
-    }
-
-    public function scopeWhereHasDatabaseNotifications(Builder $builder, QueryBuilder $databaseNotifications): void
-    {
-        $builder->whereHas('databaseNotification', static function (Builder $builder) use ($databaseNotifications): void {
-            $builder->mergeWheres($databaseNotifications->wheres, $databaseNotifications->bindings);
-        });
+        return new ThrottledNotificationBuilder($query);
     }
 }

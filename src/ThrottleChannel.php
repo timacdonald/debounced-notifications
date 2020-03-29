@@ -31,10 +31,14 @@ class ThrottleChannel
 
     public function send(Model $notifiable, Notification $notification): ThrottledNotification
     {
-        return ThrottledNotification::create([
+        $notification = ThrottledNotification::query()->create([
             'payload' => $notification,
             'delayed_until' => $this->delay->until($notifiable),
             'notification_id' => $this->databaseChannel->send($notifiable, $notification)->getKey(),
         ]);
+
+        \assert($notification instanceof ThrottledNotification);
+
+        return $notification;
     }
 }

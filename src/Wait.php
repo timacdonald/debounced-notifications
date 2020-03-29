@@ -21,7 +21,7 @@ class Wait implements WaitContract
 
     public static function fromMinutes(int $minutes): self
     {
-        return new static($minutes * Carbon::SECONDS_PER_MINUTE);
+        return new self($minutes * Carbon::SECONDS_PER_MINUTE);
     }
 
     public function lapsesAt(): Carbon

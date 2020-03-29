@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace TiMacDonald\ThrottledNotifications\Queries;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 use TiMacDonald\ThrottledNotifications\ThrottledNotificationCollection;
+use TiMacDonald\ThrottledNotifications\Builders\DatabaseNotificationBuilder;
+use TiMacDonald\ThrottledNotifications\Builders\ThrottledNotificationBuilder;
 use TiMacDonald\ThrottledNotifications\Contracts\Reservables as ReservablesContract;
 
 class Reservables implements ReservablesContract
@@ -29,10 +30,11 @@ class Reservables implements ReservablesContract
         $this->throttledNotifications = $throttledNotifications;
     }
 
-    public function query(Model $notifiable): Builder
+    public function reserve(Model $notifiable, string $key): int
     {
         return $this->throttledNotifications->query()
-            ->whereHasDatabaseNotifications($this->databaseNotifications($notifiable)->toBase());
+            ->whereHasDatabaseNotifications($this->databaseNotifications($notifiable)->toBase())
+            ->reserve($key);
     }
 
     public function get(string $key): ThrottledNotificationCollection
@@ -40,24 +42,24 @@ class Reservables implements ReservablesContract
         return new ThrottledNotificationCollection($this->reservedThrottledNotifications($key)->get());
     }
 
-    public function release(string $key): void
+    public function release(string $key): int
     {
-        $this->reservedThrottledNotifications($key)->release();
+        return $this->reservedThrottledNotifications($key)->release();
     }
 
-    public function markAsSent(string $key): void
+    public function markAsSent(string $key): int
     {
-        $this->reservedThrottledNotifications($key)->markAsSent();
+        return $this->reservedThrottledNotifications($key)->markAsSent();
     }
 
-    private function reservedThrottledNotifications(string $key): Builder
+    private function reservedThrottledNotifications(string $key): ThrottledNotificationBuilder
     {
         return ThrottledNotification::query()
             ->whereReservedKey($key)
             ->oldest();
     }
 
-    private function databaseNotifications(Model $notifiable): Builder
+    private function databaseNotifications(Model $notifiable): DatabaseNotificationBuilder
     {
         return $this->databaseNotifications->query()
             ->whereNotifiable($notifiable);

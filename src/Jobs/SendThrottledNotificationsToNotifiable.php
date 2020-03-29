@@ -37,7 +37,7 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
 
     public function handle(Reservables $reservables, Courier $courier): void
     {
-        $count = $reservables->query($this->notifiable)->reserve($this->key);
+        $count = $reservables->reserve($this->notifiable, $this->key);
 
         if ($count === 0) {
             return;
@@ -50,6 +50,20 @@ class SendThrottledNotificationsToNotifiable implements ShouldQueue
 
     public function failed(Exception $exception): void
     {
-        \resolve(Reservables::class)->release($this->key);
+        $reservables = \app(Reservables::class);
+
+        \assert($reservables instanceof Reservables);
+
+        $reservables->release($this->key);
+    }
+
+    public function notifiable(): Model
+    {
+        return $this->notifiable;
+    }
+
+    public function key(): string
+    {
+        return $this->key;
     }
 }

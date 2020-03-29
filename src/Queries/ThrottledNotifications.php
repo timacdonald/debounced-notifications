@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TiMacDonald\ThrottledNotifications\Queries;
 
-use Illuminate\Database\Eloquent\Builder;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
+use TiMacDonald\ThrottledNotifications\Builders\ThrottledNotificationBuilder;
 
 class ThrottledNotifications
 {
-    public function query(): Builder
+    public function query(): ThrottledNotificationBuilder
     {
         return ThrottledNotification::query()
             ->whereUnsent()

@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 use Tests\Notifiable;
-use Faker\Generator as Faker;
 
-$factory->define(Notifiable::class, static function (Faker $faker) {
+\assert($factory instanceof \Illuminate\Database\Eloquent\Factory);
+
+$factory->define(Notifiable::class, static function () {
     return [
     ];
 });

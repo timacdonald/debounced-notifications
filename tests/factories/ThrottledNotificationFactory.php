@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
+use Tests\Notification;
 use Faker\Generator as Faker;
-use Tests\DummyThrottledNotification;
 use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 
-$factory->define(ThrottledNotification::class, static function (Faker $faker) {
+\assert($factory instanceof \Illuminate\Database\Eloquent\Factory);
+
+$factory->define(ThrottledNotification::class, static function () {
     return [
-        'payload' => new DummyThrottledNotification(),
         'notification_id' => \factory(DatabaseNotification::class),
+        'payload' => new Notification(),
     ];
 });
 
