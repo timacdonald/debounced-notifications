@@ -15,7 +15,10 @@
     "autoload": {
         "psr-4": {
             "TiMacDonald\\ThrottledNotifications\\": "src/"
-        }
+        },
+        "classmap": [
+            "migrations"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
