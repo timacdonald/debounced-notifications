@@ -6,6 +6,9 @@ namespace Tests\Feature;
 
 use Exception;
 use Tests\TestCase;
+use Tests\Notifiable;
+use Tests\CourierFake;
+use TiMacDonald\ThrottledNotifications\Contracts\Courier;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
 use TiMacDonald\ThrottledNotifications\Jobs\SendThrottledNotificationsToNotifiable;
 
@@ -14,6 +17,7 @@ class SendThrottledNotificationsToNotifiableTest extends TestCase
     public function testNotificationsAreReserved(): void
     {
         // arrange
+        $this->app->bind(Courier::class, CourierFake::class);
         $notification = \factory(ThrottledNotification::class)->create();
         \assert($notification instanceof ThrottledNotification);
 
@@ -29,6 +33,7 @@ class SendThrottledNotificationsToNotifiableTest extends TestCase
     public function testWhenNotificationsAreReleasedWhenJobFails(): void
     {
         // arrange
+        $this->app->bind(Courier::class, CourierFake::class);
         $notification = \factory(ThrottledNotification::class)->states(['reserved'])->create([
             'reserved_key' => 'reserved-key',
         ]);
@@ -46,6 +51,7 @@ class SendThrottledNotificationsToNotifiableTest extends TestCase
     public function testNotificationsAreMarkedAsSent(): void
     {
         // arrange
+        $this->app->bind(Courier::class, CourierFake::class);
         $notification = \factory(ThrottledNotification::class)->create();
         \assert($notification instanceof ThrottledNotification);
 
@@ -61,8 +67,27 @@ class SendThrottledNotificationsToNotifiableTest extends TestCase
         $this->assertNotNull($notification->sent_at);
     }
 
+    public function testBailsWhenNotReservablesAreFound(): void
+    {
+        // arrange
+        $courier = new CourierFake();
+        $this->app->instance(Courier::class, $courier);
+        $notifiable = \factory(Notifiable::class)->create();
+        \assert($notifiable instanceof Notifiable);
+
+        // act
+        $job = new SendThrottledNotificationsToNotifiable($notifiable, 'xxxx');
+        $this->app->call([$job, 'handle']);
+
+        // assert
+        $courier->assertNothingSent();
+    }
+
     public function testCourierSendsEmailToNotifiable(): void
     {
+        // arrange
+        $courier = new CourierFake();
+        $this->app->instance(Courier::class, $courier);
         $this->markTestIncomplete();
     }
 }

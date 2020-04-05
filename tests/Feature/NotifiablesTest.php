@@ -7,7 +7,7 @@ namespace Tests\Feature;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Tests\Notifiable;
-use Tests\NotifiablesCallable;
+use TiMacDonald\CallableFake\CallableFake;
 use TiMacDonald\ThrottledNotifications\Contracts\Notifiables;
 use TiMacDonald\ThrottledNotifications\Models\DatabaseNotification;
 use TiMacDonald\ThrottledNotifications\Models\ThrottledNotification;
@@ -21,14 +21,15 @@ class NotifiablesTest extends TestCase
         $throttledNotification = \factory(ThrottledNotification::class)->create();
         \assert($throttledNotification instanceof ThrottledNotification);
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(1, $callable->received);
-        $this->assertTrue($callable->received[0]->is($throttledNotification->databaseNotification->notifiable));
+        $callable->assertCalledTimes(static function (Notifiable $notifiable) use ($throttledNotification): bool {
+            return $notifiable->is($throttledNotification->databaseNotification->notifiable);
+        }, 1);
     }
 
     public function testNotificationsBeforeWaitTimeHasLaspedAreIgnored(): void
@@ -37,13 +38,13 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         \factory(ThrottledNotification::class)->create();
         Carbon::setTestNow(Carbon::now()->addMinutes(10)->subSecond());
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(0, $callable->received);
+        $callable->assertNotInvoked();
     }
 
     public function testOnlyIncludesOnePerNotifiable(): void
@@ -64,14 +65,15 @@ class NotifiablesTest extends TestCase
         $scenario();
         $scenario();
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(1, $callable->received);
-        $this->assertTrue($callable->received[0]->is($notifiable));
+        $callable->assertCalledTimes(static function (Notifiable $received) use ($notifiable): bool {
+            return $received->is($notifiable);
+        }, 1);
     }
 
     public function testIncludesMultipleNotifiable(): void
@@ -90,15 +92,19 @@ class NotifiablesTest extends TestCase
         $first = $scenario();
         $second = $scenario();
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(2, $callable->received);
-        $this->assertTrue($callable->received[0]->is($first->notifiable));
-        $this->assertTrue($callable->received[1]->is($second->notifiable));
+        $callable->assertTimesInvoked(2);
+        $callable->assertCalled(static function (Notifiable $notifiable) use ($first): bool {
+            return $notifiable->is($first->notifiable);
+        });
+        $callable->assertCalled(static function (Notifiable $notifiable) use ($second): bool {
+            return $notifiable->is($second->notifiable);
+        });
     }
 
     public function testReadNotificationAreIgnored(): void
@@ -111,13 +117,13 @@ class NotifiablesTest extends TestCase
             'notification_id' => $databaseNotification->id,
         ]);
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(0, $callable->received);
+        $callable->assertNotInvoked();
     }
 
     public function testSentNotificationsAreIgnored(): void
@@ -126,13 +132,13 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         \factory(ThrottledNotification::class)->states(['sent'])->create();
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(0, $callable->received);
+        $callable->assertNotInvoked();
     }
 
     public function testReservedNotificationsAreIgnored(): void
@@ -141,13 +147,13 @@ class NotifiablesTest extends TestCase
         Carbon::setTestNow(Carbon::now());
         \factory(ThrottledNotification::class)->states(['reserved'])->create();
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
-        $callable = new NotifiablesCallable();
+        $callable = new CallableFake();
 
         // act
         $this->notifiables()->each($callable);
 
         // assert
-        $this->assertCount(0, $callable->received);
+        $callable->assertNotInvoked();
     }
 
     private function notifiables(): Notifiables

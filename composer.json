@@ -3,13 +3,13 @@
     "authors": [
         {
             "name": "Tim MacDonald",
-            "email": "hello@timacdonald.me"
+            "email": "hello@timacdonald.me",
+            "homepage": "https://timacdonald.me"
         }
     ],
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "infection/infection": "^0.16.1",
         "orchestra/testbench": "^5.0",
         "phpunit/phpunit": "^9.0"
     },
@@ -41,7 +41,9 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.0",
+        "infection/infection": "^0.16.1",
         "phpstan/phpstan": "^0.12",
+        "timacdonald/callable-fake": "^1.0",
         "vimeo/psalm": "^3.0"
     },
     "scripts": {
