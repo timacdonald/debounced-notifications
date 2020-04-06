@@ -13,6 +13,13 @@
         "orchestra/testbench": "^5.0",
         "phpunit/phpunit": "^9.0"
     },
+    "require-dev": {
+        "infection/infection": "^0.16.1",
+        "phpstan/phpstan": "^0.12",
+        "timacdonald/callable-fake": "^1.0",
+        "timacdonald/php-style": "dev-master",
+        "vimeo/psalm": "^3.0"
+    },
     "autoload": {
         "psr-4": {
             "TiMacDonald\\ThrottledNotifications\\": "src/"
@@ -29,22 +36,12 @@
             "tests/migrations"
         ]
     },
-    "config": {
-        "sort-packages": true
-    },
     "extra": {
         "laravel": {
             "providers": [
                 "TiMacDonald\\ThrottledNotifications\\ServiceProvider"
             ]
         }
-    },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.0",
-        "infection/infection": "^0.16.1",
-        "phpstan/phpstan": "^0.12",
-        "timacdonald/callable-fake": "^1.0",
-        "vimeo/psalm": "^3.0"
     },
     "scripts": {
         "lint": [
