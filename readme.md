@@ -1,5 +1,7 @@
 # Bundled Notifications for Laravel
 
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Ftimacdonald%2Fdebounced-notifications%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/timacdonald/debounced-notifications/master)
+
 Spamming your users with notifications? Want to reduce the noise your app is creating? You are in the right place!
 
 This package can bundle transactional notifications you send from your application into a single notification, be it email, text messages, push notifications, or whatever else. Not only does it bundle notifications, you can also implement a do not distrub / work can wait time period in which all notifications will be delayed. After the period is over, all notifications sent during that time will be bundled into a single notification.
