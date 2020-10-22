@@ -14,7 +14,7 @@
         "phpunit/phpunit": "^9.0"
     },
     "require-dev": {
-        "infection/infection": "^0.17.0",
+        "infection/infection": "^0.18.2",
         "phpstan/phpstan": "^0.12",
         "timacdonald/callable-fake": "^1.0",
         "timacdonald/php-style": "dev-master",
